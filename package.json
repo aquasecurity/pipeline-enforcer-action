@@ -8,7 +8,7 @@
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
-    "package:main": "ncc build lib/index.js -o dist/main/index.js --license licenses.txt",
+    "package:main": "ncc build lib/index.js -o dist/main/ --license licenses.txt",
     "package:post": "ncc build lib/post.js -o dist/post/ --license licenses.txt",
     "package": "concurrently 'npm:package:main' 'npm:package:post'",
     "test": "jest",
