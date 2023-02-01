@@ -70,7 +70,7 @@ const getFileSHA256 = (filePath) => {
     return hash;
 };
 const executeInstallationScript = (aquaKey, aquaSecret) => __awaiter(void 0, void 0, void 0, function* () {
-    const command = `${INSTALLATION_SCRIPT_PATH}`;
+    const command = `./${INSTALLATION_SCRIPT_PATH}`;
     yield (0, exec_1.exec)(command, undefined, {
         env: {
             BINDIR: '.',
@@ -83,6 +83,8 @@ const downloadTraceeCommercial = (aquaKey, aquaSecret) => __awaiter(void 0, void
     yield downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
     const expectedChecksum = yield getChecksum();
     const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH);
+    core.debug(`Expected checksum: ${expectedChecksum}`);
+    core.debug(`Actual checksum: ${actualChecksum}`);
     if (expectedChecksum !== actualChecksum) {
         throw new Error(`Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`);
     }

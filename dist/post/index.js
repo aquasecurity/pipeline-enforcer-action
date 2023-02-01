@@ -41,8 +41,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
+const fs = __importStar(__nccwpck_require__(747));
 const executeTraceeEnd = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, exec_1.exec)('./tracee ci end');
+    if (fs.existsSync('./tracee')) {
+        yield (0, exec_1.exec)('./tracee ci end');
+    }
+    else {
+        throw new Error('Tracee Commercial was not found');
+    }
 });
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
