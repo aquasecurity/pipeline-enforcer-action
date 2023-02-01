@@ -38,24 +38,12 @@ const getFileSHA256 = (filePath: string) => {
   return hash
 }
 
-const executeInstallationScript = async (
-  aquaKey: string,
-  aquaSecret: string
-) => {
-  const command = `sh`
-  await exec(command, [INSTALLATION_SCRIPT_PATH], {
-    env: {
-      BINDIR: '.',
-      AQUA_KEY: aquaKey,
-      AQUA_SECRET: aquaSecret
-    }
-  })
+const executeInstallationScript = async () => {
+  const command = `BINDIR="." sh`
+  await exec(command, [INSTALLATION_SCRIPT_PATH])
 }
 
-const downloadTraceeCommercial = async (
-  aquaKey: string,
-  aquaSecret: string
-) => {
+const downloadTraceeCommercial = async () => {
   await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
   const expectedChecksum = await getChecksum()
   const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
@@ -67,7 +55,7 @@ const downloadTraceeCommercial = async (
     )
   }
 
-  await executeInstallationScript(aquaKey, aquaSecret)
+  await executeInstallationScript()
   try {
     fs.rmSync(INSTALLATION_SCRIPT_PATH)
   } catch (error) {
@@ -114,7 +102,7 @@ async function run(): Promise<void> {
     const aquaKey = core.getInput('aqua-key')
     const aquaSecret = core.getInput('aqua-secret')
     core.debug('Downloading Tracee Commercial binary')
-    await downloadTraceeCommercial(aquaKey, aquaSecret)
+    await downloadTraceeCommercial()
     core.info('Tracee Commercial binary downloaded successfully')
 
     let repoPath = core.getInput('repo-path')

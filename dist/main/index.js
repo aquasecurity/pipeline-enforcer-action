@@ -69,17 +69,11 @@ const getFileSHA256 = (filePath) => {
     const hash = crypto_1.default.createHash('sha256').update(data).digest('hex');
     return hash;
 };
-const executeInstallationScript = (aquaKey, aquaSecret) => __awaiter(void 0, void 0, void 0, function* () {
-    const command = `sh`;
-    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
-        env: {
-            BINDIR: '.',
-            AQUA_KEY: aquaKey,
-            AQUA_SECRET: aquaSecret
-        }
-    });
+const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, function* () {
+    const command = `BINDIR="." sh`;
+    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH]);
 });
-const downloadTraceeCommercial = (aquaKey, aquaSecret) => __awaiter(void 0, void 0, void 0, function* () {
+const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
     yield downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
     const expectedChecksum = yield getChecksum();
     const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH);
@@ -88,7 +82,7 @@ const downloadTraceeCommercial = (aquaKey, aquaSecret) => __awaiter(void 0, void
     if (expectedChecksum !== actualChecksum) {
         throw new Error(`Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`);
     }
-    yield executeInstallationScript(aquaKey, aquaSecret);
+    yield executeInstallationScript();
     try {
         fs.rmSync(INSTALLATION_SCRIPT_PATH);
     }
@@ -128,7 +122,7 @@ function run() {
             const aquaKey = core.getInput('aqua-key');
             const aquaSecret = core.getInput('aqua-secret');
             core.debug('Downloading Tracee Commercial binary');
-            yield downloadTraceeCommercial(aquaKey, aquaSecret);
+            yield downloadTraceeCommercial();
             core.info('Tracee Commercial binary downloaded successfully');
             let repoPath = core.getInput('repo-path');
             if (repoPath === '') {
