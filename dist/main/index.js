@@ -70,8 +70,10 @@ const getFileSHA256 = (filePath) => {
     return hash;
 };
 const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, function* () {
-    const command = `BINDIR="." sh`;
-    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH]);
+    const command = `sh`;
+    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
+        env: Object.assign({ BINDIR: '.' }, process.env)
+    });
 });
 const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
     yield downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
