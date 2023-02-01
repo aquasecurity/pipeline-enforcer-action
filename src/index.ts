@@ -39,8 +39,13 @@ const getFileSHA256 = (filePath: string) => {
 }
 
 const executeInstallationScript = async () => {
-  const command = `BINDIR="." sh`
-  await exec(command, [INSTALLATION_SCRIPT_PATH])
+  const command = `sh`
+  await exec(command, [INSTALLATION_SCRIPT_PATH], {
+    env: {
+      BINDIR: '.',
+      ...process.env
+    }
+  })
 }
 
 const downloadTraceeCommercial = async () => {
