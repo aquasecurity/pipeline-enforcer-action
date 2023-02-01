@@ -42,8 +42,8 @@ const executeInstallationScript = async (
   aquaKey: string,
   aquaSecret: string
 ) => {
-  const command = `./${INSTALLATION_SCRIPT_PATH}`
-  await exec(command, undefined, {
+  const command = `sh`
+  await exec(command, [INSTALLATION_SCRIPT_PATH], {
     env: {
       BINDIR: '.',
       AQUA_KEY: aquaKey,

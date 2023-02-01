@@ -70,8 +70,8 @@ const getFileSHA256 = (filePath) => {
     return hash;
 };
 const executeInstallationScript = (aquaKey, aquaSecret) => __awaiter(void 0, void 0, void 0, function* () {
-    const command = `./${INSTALLATION_SCRIPT_PATH}`;
-    yield (0, exec_1.exec)(command, undefined, {
+    const command = `sh`;
+    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
         env: {
             BINDIR: '.',
             AQUA_KEY: aquaKey,
