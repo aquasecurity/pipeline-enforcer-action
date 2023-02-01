@@ -77,7 +77,7 @@ const executeTraceeInBackground = async (
   accessToken: string
 ) => {
   const command = `bash`
-  await exec(command, ['-c', `nohup ./tracee ci start -r "${repoPath}" &`], {
+  await exec(command, ['-c', `./tracee ci start -r "${repoPath}" &`], {
     env: {
       ...process.env,
       AQUA_KEY: aquaKey,
