@@ -43,8 +43,7 @@ const executeInstallationScript = async () => {
   await exec(command, [INSTALLATION_SCRIPT_PATH], {
     env: {
       ...process.env,
-      BINDIR: '.',
-      PATH: `/usr/bin/:${process.env.PATH}`
+      BINDIR: '.'
     }
   })
 }
@@ -82,7 +81,8 @@ const executeTraceeInBackground = async (
     env: {
       AQUA_KEY: aquaKey,
       AQUA_SECRET: aquaSecret,
-      ACCESS_TOKEN: accessToken
+      ACCESS_TOKEN: accessToken,
+      ...process.env
     }
   })
 }

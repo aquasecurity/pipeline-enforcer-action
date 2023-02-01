@@ -72,7 +72,7 @@ const getFileSHA256 = (filePath) => {
 const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, function* () {
     const command = `sh`;
     yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
-        env: Object.assign(Object.assign({}, process.env), { BINDIR: '.', PATH: `/usr/bin/:${process.env.PATH}` })
+        env: Object.assign(Object.assign({}, process.env), { BINDIR: '.' })
     });
 });
 const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -97,11 +97,7 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
 const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) => __awaiter(void 0, void 0, void 0, function* () {
     const command = `./tracee ci start -r "${repoPath}" &`;
     yield (0, exec_1.exec)(command, undefined, {
-        env: {
-            AQUA_KEY: aquaKey,
-            AQUA_SECRET: aquaSecret,
-            ACCESS_TOKEN: accessToken
-        }
+        env: Object.assign({ AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }, process.env)
     });
 });
 const waitForTraceeToInitialize = (timeout, initFilePath) => {
