@@ -101,8 +101,6 @@ const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) =
         // @ts-ignore
         detached: true
     });
-    // Sleep for 10 seconds to allow Tracee to initialize
-    yield new Promise(resolve => setTimeout(resolve, 10000));
 });
 const waitForTraceeToInitialize = (timeout, initFilePath) => {
     return new Promise((resolve, reject) => {
@@ -135,7 +133,7 @@ function run() {
             core.debug('Starting Tracee Commercial in the background');
             yield executeTraceeInBackground(repoPath, aquaKey, aquaSecret, accessToken);
             core.info('Tracee Commercial started successfully');
-            core.debug('Waiting for Tracee Commercial to initialize');
+            core.debug('Waiting for Tracee Commercial to initialize.');
             yield waitForTraceeToInitialize(30000, TRACEE_INIT_FILE);
             core.info('Tracee Commercial initialized successfully');
         }
