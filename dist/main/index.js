@@ -71,6 +71,9 @@ const getFileSHA256 = (filePath) => {
 };
 const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, function* () {
     const command = `sh`;
+    yield (0, exec_1.exec)('printenv', undefined, {
+        env: Object.assign({ BINDIR: '.' }, process.env)
+    });
     yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
         env: Object.assign({ BINDIR: '.' }, process.env)
     });
