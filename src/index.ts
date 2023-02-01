@@ -127,7 +127,7 @@ async function run(): Promise<void> {
     await executeTraceeInBackground(repoPath, aquaKey, aquaSecret, accessToken)
     core.info('Tracee Commercial started successfully')
 
-    core.debug('Waiting for Tracee Commercial to initialize')
+    core.debug('Waiting for Tracee Commercial to initialize.')
     await waitForTraceeToInitialize(30000, TRACEE_INIT_FILE)
     core.info('Tracee Commercial initialized successfully')
   } catch (error) {
