@@ -8,7 +8,9 @@
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
-    "package": "ncc build lib/index.js -o dist/main/index.js --license licenses.txt && ncc build lib/post.js -o dist/post/ --license licenses.txt",
+    "package:main": "ncc build lib/index.js -o dist/main/index.js --license licenses.txt",
+    "package:post": "ncc build lib/post.js -o dist/post/ --license licenses.txt",
+    "package": "concurrently 'npm:package:main' 'npm:package:post'",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
@@ -39,6 +41,7 @@
     "js-yaml": "^4.1.0",
     "prettier": "2.5.1",
     "ts-jest": "^27.1.2",
+    "concurrently": "^4.1.0",
     "typescript": "^4.4.4"
   }
 }
