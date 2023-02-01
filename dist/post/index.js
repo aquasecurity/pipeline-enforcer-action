@@ -43,14 +43,12 @@ const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const fs = __importStar(__nccwpck_require__(747));
 const executeTraceeEnd = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (fs.existsSync('./tracee')) {
-        const result = yield (0, exec_1.getExecOutput)('./tracee ci end');
-        if (result.exitCode != 0) {
-            throw new Error(result.stdout + result.stderr);
-        }
-    }
-    else {
+    if (!fs.existsSync('./tracee')) {
         throw new Error('Tracee Commercial was not found');
+    }
+    const result = yield (0, exec_1.getExecOutput)('./tracee ci end');
+    if (result.exitCode != 0) {
+        throw new Error(result.stdout + result.stderr);
     }
 });
 function run() {

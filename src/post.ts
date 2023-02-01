@@ -3,13 +3,13 @@ import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
 
 const executeTraceeEnd = async () => {
-  if (fs.existsSync('./tracee')) {
-    const result = await getExecOutput('./tracee ci end')
-    if (result.exitCode != 0) {
-      throw new Error(result.stdout + result.stderr)
-    }
-  } else {
+  if (!fs.existsSync('./tracee')) {
     throw new Error('Tracee Commercial was not found')
+  }
+
+  const result = await getExecOutput('./tracee ci end')
+  if (result.exitCode != 0) {
+    throw new Error(result.stdout + result.stderr)
   }
 }
 
