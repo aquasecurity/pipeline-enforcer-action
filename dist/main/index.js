@@ -97,7 +97,7 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
 const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) => __awaiter(void 0, void 0, void 0, function* () {
     const command = `./tracee ci start -r "${repoPath}" &`;
     yield (0, exec_1.exec)(command, undefined, {
-        env: Object.assign({ AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }, process.env)
+        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken })
     });
 });
 const waitForTraceeToInitialize = (timeout, initFilePath) => {

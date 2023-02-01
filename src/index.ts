@@ -79,10 +79,10 @@ const executeTraceeInBackground = async (
   const command = `./tracee ci start -r "${repoPath}" &`
   await exec(command, undefined, {
     env: {
+      ...process.env,
       AQUA_KEY: aquaKey,
       AQUA_SECRET: aquaSecret,
-      ACCESS_TOKEN: accessToken,
-      ...process.env
+      ACCESS_TOKEN: accessToken
     }
   })
 }

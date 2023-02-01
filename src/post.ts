@@ -4,7 +4,10 @@ import * as fs from 'fs'
 
 const executeTraceeEnd = async () => {
   if (fs.existsSync('./tracee')) {
-    await exec('./tracee ci end')
+    const result = await exec('./tracee ci end')
+    if (result !== 0) {
+      throw new Error('Tracee Commercial failed')
+    }
   } else {
     throw new Error('Tracee Commercial was not found')
   }
