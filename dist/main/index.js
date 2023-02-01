@@ -101,6 +101,8 @@ const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) =
         // @ts-ignore
         detached: true
     });
+    // Sleep for 10 seconds to allow Tracee to initialize
+    yield new Promise(resolve => setTimeout(resolve, 10000));
 });
 const waitForTraceeToInitialize = (timeout, initFilePath) => {
     return new Promise((resolve, reject) => {
