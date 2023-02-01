@@ -87,9 +87,6 @@ const executeTraceeInBackground = async (
     // @ts-ignore
     detached: true
   })
-
-  // Sleep for 10 seconds to allow Tracee to initialize
-  await new Promise(resolve => setTimeout(resolve, 10000))
 }
 
 const waitForTraceeToInitialize = (timeout: number, initFilePath: string) => {
