@@ -12,7 +12,7 @@ const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL =
 
 const INSTALLATION_SCRIPT_PATH = 'install.sh'
 
-const TRACEE_INIT_FILE = '/tmp/tracee-init'
+const TRACEE_INIT_FILE = '/tmp/tracee-ci.start'
 
 const httpClient = new http.HttpClient('tracee-action')
 
@@ -127,7 +127,7 @@ async function run(): Promise<void> {
     core.info('Tracee Commercial started successfully')
 
     core.debug('Waiting for Tracee Commercial to initialize')
-    // await waitForTraceeToInitialize(30000, TRACEE_INIT_FILE)
+    await waitForTraceeToInitialize(30000, TRACEE_INIT_FILE)
     core.info('Tracee Commercial initialized successfully')
   } catch (error) {
     if (error instanceof Error) {

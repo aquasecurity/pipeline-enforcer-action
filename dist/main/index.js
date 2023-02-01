@@ -50,7 +50,7 @@ const exec_1 = __nccwpck_require__(514);
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/tracee/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
-const TRACEE_INIT_FILE = '/tmp/tracee-init';
+const TRACEE_INIT_FILE = '/tmp/tracee-ci.start';
 const httpClient = new http.HttpClient('tracee-action');
 const downloadToFile = (url, filePath) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield httpClient.get(url);
@@ -135,7 +135,7 @@ function run() {
             yield executeTraceeInBackground(repoPath, aquaKey, aquaSecret, accessToken);
             core.info('Tracee Commercial started successfully');
             core.debug('Waiting for Tracee Commercial to initialize');
-            // await waitForTraceeToInitialize(30000, TRACEE_INIT_FILE)
+            yield waitForTraceeToInitialize(30000, TRACEE_INIT_FILE);
             core.info('Tracee Commercial initialized successfully');
         }
         catch (error) {
