@@ -2,7 +2,7 @@ import crypto from 'crypto'
 
 import * as fs from 'fs'
 import * as core from '@actions/core'
-import http from '@actions/http-client'
+import * as http from '@actions/http-client'
 import {exec} from '@actions/exec'
 
 const INTEGRITY_CLI_DOWNLOAD_URL =

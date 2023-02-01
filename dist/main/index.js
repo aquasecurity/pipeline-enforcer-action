@@ -45,13 +45,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const crypto_1 = __importDefault(__nccwpck_require__(417));
 const fs = __importStar(__nccwpck_require__(747));
 const core = __importStar(__nccwpck_require__(186));
-const http_client_1 = __importDefault(__nccwpck_require__(255));
+const http = __importStar(__nccwpck_require__(255));
 const exec_1 = __nccwpck_require__(514);
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/tracee/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
 const TRACEE_INIT_FILE = '/tmp/tracee-init';
-const httpClient = new http_client_1.default.HttpClient('tracee-action');
+const httpClient = new http.HttpClient('tracee-action');
 const downloadToFile = (url, filePath) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield httpClient.get(url);
     const responseBody = yield response.readBody();
