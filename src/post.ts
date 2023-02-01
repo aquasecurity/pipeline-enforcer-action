@@ -1,12 +1,12 @@
 import * as core from '@actions/core'
-import {exec} from '@actions/exec'
+import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
 
 const executeTraceeEnd = async () => {
   if (fs.existsSync('./tracee')) {
-    const result = await exec('./tracee ci end')
-    if (result !== 0) {
-      throw new Error('Tracee Commercial failed')
+    const result = await getExecOutput('./tracee ci end')
+    if (result.exitCode != 0) {
+      throw new Error(result.stdout + result.stderr)
     }
   } else {
     throw new Error('Tracee Commercial was not found')
