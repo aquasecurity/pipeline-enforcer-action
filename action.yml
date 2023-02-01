@@ -1,0 +1,8 @@
+name: Tracee Commercial Action
+description: |
+  This action generates a profile using Tracee, and sends it to Aqua platform.
+  It requires a valid Aqua license.
+runs:
+  using: 'node16'
+  main: 'lib/index.js'
+  post: 'lib/post.js'
