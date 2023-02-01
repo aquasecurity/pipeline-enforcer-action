@@ -2,6 +2,19 @@ name: Tracee Commercial Action
 description: |
   This action generates a profile using Tracee, and sends it to Aqua platform.
   It requires a valid Aqua license.
+inputs:
+  access-token:
+    description: 'Aqua access token'
+    required: true
+  aqua-key:
+    description: 'Aqua key'
+    required: true
+  aqua-secret:
+    description: 'Aqua secret'
+    required: true
+  repo-path:
+    description: 'Path to the repository'
+    required: false
 runs:
   using: 'node16'
   main: 'lib/index.js'
