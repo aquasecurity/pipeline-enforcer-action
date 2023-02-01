@@ -1550,6 +1550,10 @@ class ToolRunner extends events.EventEmitter {
         if (options.windowsVerbatimArguments) {
             result.argv0 = `"${toolPath}"`;
         }
+        if (options.detached) {
+            result.detached = options.detached;
+            result.stdio = 'ignore';
+        }
         return result;
     }
     /**

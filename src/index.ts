@@ -76,14 +76,16 @@ const executeTraceeInBackground = async (
   aquaSecret: string,
   accessToken: string
 ) => {
-  const command = `./tracee`
-  await exec(command, ['ci', 'start', '-r', repoPath, '&'], {
+  const command = `bash`
+  await exec(command, ['-c', './tracee', 'ci', 'start', '-r', repoPath, '&'], {
     env: {
       ...process.env,
       AQUA_KEY: aquaKey,
       AQUA_SECRET: aquaSecret,
       ACCESS_TOKEN: accessToken
-    }
+    },
+    // @ts-ignore
+    detach: true
   })
 }
 

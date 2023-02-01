@@ -95,9 +95,11 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
     }
 });
 const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const command = `./tracee`;
-    yield (0, exec_1.exec)(command, ['ci', 'start', '-r', repoPath, '&'], {
-        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken })
+    const command = `bash`;
+    yield (0, exec_1.exec)(command, ['-c', './tracee', 'ci', 'start', '-r', repoPath, '&'], {
+        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
+        // @ts-ignore
+        detach: true
     });
 });
 const waitForTraceeToInitialize = (timeout, initFilePath) => {
@@ -1623,6 +1625,10 @@ class ToolRunner extends events.EventEmitter {
             options.windowsVerbatimArguments || this._isCmdFile();
         if (options.windowsVerbatimArguments) {
             result.argv0 = `"${toolPath}"`;
+        }
+        if (options.detached) {
+            result.detached = options.detached;
+            result.stdio = 'ignore';
         }
         return result;
     }
