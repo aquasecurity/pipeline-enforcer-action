@@ -4,7 +4,7 @@ description: |
   It requires a valid Aqua license.
 inputs:
   access-token:
-    description: 'Aqua access token'
+    description: 'SCM access token'
     required: true
   aqua-key:
     description: 'Aqua key'
