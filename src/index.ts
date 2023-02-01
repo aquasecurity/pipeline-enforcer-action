@@ -96,6 +96,7 @@ const waitForTraceeToInitialize = (timeout: number, initFilePath: string) => {
   return new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
       if (fs.existsSync(initFilePath)) {
+        core.debug(`Found Tracee init file: ${initFilePath}`)
         clearInterval(interval)
         resolve()
       }
