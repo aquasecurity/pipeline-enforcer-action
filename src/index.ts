@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import * as core from '@actions/core'
 import * as http from '@actions/http-client'
 import {exec} from '@actions/exec'
+import {spawn} from 'child_process'
 
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/tracee/install.sh'
@@ -76,15 +77,18 @@ const executeTraceeInBackground = async (
   aquaSecret: string,
   accessToken: string
 ) => {
-  const command = `./tracee ci start -r "${repoPath}" &`
-  await exec(command, undefined, {
+  const command = `./tracee ci start -r "${repoPath}"`
+  const child = spawn(command, [], {
     env: {
       ...process.env,
       AQUA_KEY: aquaKey,
       AQUA_SECRET: aquaSecret,
       ACCESS_TOKEN: accessToken
-    }
+    },
+    detached: true,
+    stdio: 'ignore'
   })
+  child.unref()
 }
 
 const waitForTraceeToInitialize = (timeout: number, initFilePath: string) => {

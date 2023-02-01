@@ -47,6 +47,7 @@ const fs = __importStar(__nccwpck_require__(747));
 const core = __importStar(__nccwpck_require__(186));
 const http = __importStar(__nccwpck_require__(255));
 const exec_1 = __nccwpck_require__(514);
+const child_process_1 = __nccwpck_require__(129);
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/tracee/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
@@ -95,10 +96,13 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
     }
 });
 const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const command = `./tracee ci start -r "${repoPath}" &`;
-    yield (0, exec_1.exec)(command, undefined, {
-        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken })
+    const command = `./tracee ci start -r "${repoPath}"`;
+    const child = (0, child_process_1.spawn)(command, [], {
+        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
+        detached: true,
+        stdio: 'ignore'
     });
+    child.unref();
 });
 const waitForTraceeToInitialize = (timeout, initFilePath) => {
     return new Promise((resolve, reject) => {
