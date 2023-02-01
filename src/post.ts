@@ -16,7 +16,6 @@ const executeTraceeEnd = async () => {
 async function run(): Promise<void> {
   try {
     core.info('Ending Tracee Commercial run')
-    await exec('printenv')
     await executeTraceeEnd()
     core.debug('Tracee Commercial ended successfully')
   } catch (error) {

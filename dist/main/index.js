@@ -138,7 +138,6 @@ function run() {
             core.debug('Waiting for Tracee Commercial to initialize');
             yield waitForTraceeToInitialize(30000, TRACEE_INIT_FILE);
             core.info('Tracee Commercial initialized successfully');
-            core.setFailed('test');
         }
         catch (error) {
             if (error instanceof Error) {
