@@ -40,16 +40,11 @@ const getFileSHA256 = (filePath: string) => {
 
 const executeInstallationScript = async () => {
   const command = `sh`
-  await exec('printenv', undefined, {
-    env: {
-      BINDIR: '.',
-      ...process.env
-    }
-  })
   await exec(command, [INSTALLATION_SCRIPT_PATH], {
     env: {
+      ...process.env,
       BINDIR: '.',
-      ...process.env
+      PATH: `/usr/bin/:${process.env.PATH}`
     }
   })
 }
