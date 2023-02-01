@@ -57,6 +57,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.info('Ending Tracee Commercial run');
+            yield (0, exec_1.exec)('printenv');
             yield executeTraceeEnd();
             core.debug('Tracee Commercial ended successfully');
         }
