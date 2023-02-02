@@ -29,9 +29,9 @@ jobs:
       - name: Tracee
         uses: aquasecurity/trace-commercial-action@v1
         with:
-		aqua-key: ${{ secrets.AQUA_KEY }}
-		aqua-secret: ${{ secrets.AQUA_SECRET }}
-		access-token: ${{ secrets.GITHUB_TOKEN }}
+          aqua-key: ${{ secrets.AQUA_KEY }}
+          aqua-secret: ${{ secrets.AQUA_SECRET }}
+          access-token: ${{ secrets.GITHUB_TOKEN }}
       - ...
 ```
 
@@ -51,10 +51,10 @@ jobs:
     - name: Tracee
       uses: aquasecurity/trace-commercial-action@v1
       with:
-		aqua-key: ${{ secrets.AQUA_KEY }}
-		aqua-secret: ${{ secrets.AQUA_SECRET }}
-		access-token: ${{ secrets.GITHUB_TOKEN }}
-		repo-path: my-repo
+        aqua-key: ${{ secrets.AQUA_KEY }}
+        aqua-secret: ${{ secrets.AQUA_SECRET }}
+        access-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-path: my-repo
     - ...
 ```
 
