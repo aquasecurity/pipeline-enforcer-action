@@ -6,6 +6,7 @@ description: |
 inputs:
   access-token:
     description: 'SCM access token'
+    default: '${{ github.token }}'
     required: true
   aqua-key:
     description: 'Aqua key'
