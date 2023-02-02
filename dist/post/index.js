@@ -42,11 +42,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const fs = __importStar(__nccwpck_require__(747));
-const executeTraceeEnd = () => __awaiter(void 0, void 0, void 0, function* () {
+const executeTraceeEnd = (verbose = false) => __awaiter(void 0, void 0, void 0, function* () {
     if (!fs.existsSync('./tracee')) {
         throw new Error('Tracee Commercial was not found');
     }
-    const result = yield (0, exec_1.getExecOutput)('./tracee ci end');
+    const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`;
+    const result = yield (0, exec_1.getExecOutput)(traceeCommand);
     if (result.exitCode != 0) {
         throw new Error(result.stdout + result.stderr);
     }
@@ -54,8 +55,9 @@ const executeTraceeEnd = () => __awaiter(void 0, void 0, void 0, function* () {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const verbose = core.getInput('verbose') === 'true';
             core.info('Ending Tracee Commercial run');
-            yield executeTraceeEnd();
+            yield executeTraceeEnd(verbose);
             core.debug('Tracee Commercial ended successfully');
         }
         catch (error) {

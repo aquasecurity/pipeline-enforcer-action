@@ -43,10 +43,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const crypto_1 = __importDefault(__nccwpck_require__(417));
-const fs = __importStar(__nccwpck_require__(747));
 const core = __importStar(__nccwpck_require__(186));
-const http = __importStar(__nccwpck_require__(255));
 const exec_1 = __nccwpck_require__(514);
+const http = __importStar(__nccwpck_require__(255));
+const fs = __importStar(__nccwpck_require__(747));
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/tracee/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
@@ -94,9 +94,10 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
         }
     }
 });
-const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken) => __awaiter(void 0, void 0, void 0, function* () {
+const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken, verbose = false) => __awaiter(void 0, void 0, void 0, function* () {
     const command = `bash`;
-    yield (0, exec_1.exec)(command, ['-c', `./tracee ci start -r "${repoPath}" &`], {
+    const traceeCommand = `./tracee ci start -r "${repoPath}" ${verbose ? '-v' : ''} &`;
+    yield (0, exec_1.exec)(command, ['-c', traceeCommand], {
         env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
         // @ts-ignore
         detached: true
@@ -129,9 +130,10 @@ function run() {
             if (repoPath === '') {
                 repoPath = '.';
             }
+            const verbose = core.getInput('verbose') === 'true';
             const accessToken = core.getInput('access-token');
             core.debug('Starting Tracee Commercial in the background');
-            yield executeTraceeInBackground(repoPath, aquaKey, aquaSecret, accessToken);
+            yield executeTraceeInBackground(repoPath, aquaKey, aquaSecret, accessToken, verbose);
             core.info('Tracee Commercial started successfully');
             core.debug('Waiting for Tracee Commercial to initialize.');
             yield waitForTraceeToInitialize(30000, TRACEE_INIT_FILE);
