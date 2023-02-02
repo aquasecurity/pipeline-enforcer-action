@@ -1,1 +1,70 @@
-# tracee-commercial-action
+# Tracee Commercial Action
+
+This action is used to protect your GitHub workflows by generating a profile of your workflow job using Aqua Security's Tracee.
+The profile provides visibility of your workflow jobs and allows you to enforce policies from Aqua platform.
+To use this action, you need to have an Aqua account and generate a key and a secret from Aqua platform.
+
+---
+
+## Table of Contents
+
+- [Usage](#usage)
+- [Inputs](#inputs)
+
+---
+
+## Usage
+
+### Profile your workflow job
+
+```yaml
+name: Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Tracee
+        uses: aquasecurity/trace-commercial-action@v1
+        with:
+          aqua-key: ${{ secrets.AQUA_KEY }}
+          aqua-secret: ${{ secrets.AQUA_SECRET }}
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+      - ...
+```
+
+### If the repository is cloned in a different folder
+
+```yaml
+name: Build
+on: [push]
+
+jobs:
+  build:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        path: my-repo
+    - name: Tracee
+      uses: aquasecurity/trace-commercial-action@v1
+      with:
+        aqua-key: ${{ secrets.AQUA_KEY }}
+        aqua-secret: ${{ secrets.AQUA_SECRET }}
+        access-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-path: my-repo
+    - ...
+```
+
+---
+
+## Inputs
+
+| Name           | type     | description                                                                                                                                                                                         | required | default             |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------- |
+| `aqua-key`     | `string` | Aqua key                                                                                                                                                                                            | `true`   |                     |
+| `aqua-secret`  | `string` | Aqua secret                                                                                                                                                                                         | `true`   |                     |
+| `access-token` | `string` | GitHub access token, defaults to the CI token, if CI permissions are specified, use the `action: read` permission. If a custom access token is used, make sure to have the `repo: read` permissions | `true`   | `${{github.token}}` |
+| `repo-path`    | `string` | Repository path                                                                                                                                                                                     | `false`  | `.`                 |

@@ -1,10 +1,12 @@
 name: Tracee Commercial Action
 description: |
-  This action generates a profile using Tracee, and sends it to Aqua platform.
-  It requires a valid Aqua license.
+  This action is used to protect your GitHub workflows by generating a profile of your workflow job using Aqua Security's Tracee.
+  The profile provides visibility of your workflow jobs and allows you to enforce policies from Aqua platform.
+  To use this action, you need to have an Aqua account and generate a key and a secret from Aqua platform.
 inputs:
   access-token:
     description: 'SCM access token'
+    default: '${{ github.token }}'
     required: true
   aqua-key:
     description: 'Aqua key'
