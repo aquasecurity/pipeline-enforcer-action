@@ -1,8 +1,8 @@
 # Tracee Commercial Action
 
-This action generates a profile of your workflow job, using Aqua's Tracee.
-The profile is used to provide visibility, and policing of your workflow jobs, and allows you to enforce policies from Aqua platform.
-To use this action, you need to have an Aqua account, and generate aqua key and secret from Aqua platform.
+This action is used to protect your GitHub workflows by generating a profile of your workflow job using Aqua Security's Tracee.
+The profile provides visibility of your workflow jobs and allows you to enforce policies from Aqua platform.
+To use this action, you need to have an Aqua account and generate a key and a secret from Aqua platform.
 
 ---
 
