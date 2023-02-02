@@ -1,9 +1,9 @@
 import crypto from 'crypto'
 
-import * as fs from 'fs'
 import * as core from '@actions/core'
-import * as http from '@actions/http-client'
 import {exec} from '@actions/exec'
+import * as http from '@actions/http-client'
+import * as fs from 'fs'
 
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/tracee/install.sh'
@@ -74,10 +74,14 @@ const executeTraceeInBackground = async (
   repoPath: string,
   aquaKey: string,
   aquaSecret: string,
-  accessToken: string
+  accessToken: string,
+  verbose: boolean = false
 ) => {
   const command = `bash`
-  await exec(command, ['-c', `./tracee ci start -r "${repoPath}" &`], {
+  const traceeCommand = `./tracee ci start -r "${repoPath}" ${
+    verbose ? '-v' : ''
+  } &`
+  await exec(command, ['-c', traceeCommand], {
     env: {
       ...process.env,
       AQUA_KEY: aquaKey,
@@ -119,9 +123,17 @@ async function run(): Promise<void> {
       repoPath = '.'
     }
 
+    const verbose = core.getInput('verbose') === 'true'
+
     const accessToken = core.getInput('access-token')
     core.debug('Starting Tracee Commercial in the background')
-    await executeTraceeInBackground(repoPath, aquaKey, aquaSecret, accessToken)
+    await executeTraceeInBackground(
+      repoPath,
+      aquaKey,
+      aquaSecret,
+      accessToken,
+      verbose
+    )
     core.info('Tracee Commercial started successfully')
 
     core.debug('Waiting for Tracee Commercial to initialize.')

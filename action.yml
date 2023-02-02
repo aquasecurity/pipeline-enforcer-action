@@ -17,6 +17,10 @@ inputs:
   repo-path:
     description: 'Path to the repository'
     required: false
+  verbose:
+    description: 'Print verbose logs'
+    default: 'false'
+    required: false
 runs:
   using: 'node16'
   main: 'dist/main/index.js'
