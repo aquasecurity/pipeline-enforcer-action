@@ -62,9 +62,9 @@ jobs:
 
 ## Inputs
 
-| Name           | type     | description                                                                | required | default |
-| -------------- | -------- | -------------------------------------------------------------------------- | -------- | ------- |
-| `aqua-key`     | `string` | Aqua key                                                                   | `true`   |         |
-| `aqua-secret`  | `string` | Aqua secret                                                                | `true`   |         |
-| `access-token` | `string` | GitHub access token, use default `secrets.GITHUB_TOKEN` with `permissions` | `true`   |         |
-| `repo-path`    | `string` | Repository path                                                            | `false`  | `.`     |
+| Name           | type     | description                                             | required | default |
+| -------------- | -------- | ------------------------------------------------------- | -------- | ------- |
+| `aqua-key`     | `string` | Aqua key                                                | `true`   |         |
+| `aqua-secret`  | `string` | Aqua secret                                             | `true`   |         |
+| `access-token` | `string` | GitHub access token, use default `secrets.GITHUB_TOKEN` | `true`   |         |
+| `repo-path`    | `string` | Repository path                                         | `false`  | `.`     |
