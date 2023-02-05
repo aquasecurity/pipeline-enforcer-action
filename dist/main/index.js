@@ -100,7 +100,7 @@ const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken, v
     if (verbose) {
         args.push('-v');
     }
-    yield (0, exec_1.exec)(command, args, {
+    yield (0, exec_1.exec)(command, [...args, '&'], {
         env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
         // @ts-ignore
         detached: true

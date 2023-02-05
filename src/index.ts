@@ -82,7 +82,7 @@ const executeTraceeInBackground = async (
   if (verbose) {
     args.push('-v')
   }
-  await exec(command, args, {
+  await exec(command, [...args, '&'], {
     env: {
       ...process.env,
       AQUA_KEY: aquaKey,
