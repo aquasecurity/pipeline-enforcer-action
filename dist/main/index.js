@@ -97,7 +97,7 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
 const executeTraceeInBackground = (repoPath, aquaKey, aquaSecret, accessToken, verbose = false) => __awaiter(void 0, void 0, void 0, function* () {
     const command = `bash`;
     const traceeCommand = `./tracee ci start -r "${repoPath}" ${verbose ? '-v' : ''} &`;
-    yield (0, exec_1.exec)(traceeCommand, undefined, {
+    yield (0, exec_1.exec)(command, ['-c', traceeCommand], {
         env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
         // @ts-ignore
         detached: true
