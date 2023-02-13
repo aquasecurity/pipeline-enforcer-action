@@ -27,8 +27,13 @@ const executeTraceeEnd = async (verbose: boolean) => {
 async function run(): Promise<void> {
   try {
     const verbose = core.getInput('verbose') === 'true'
+    const logFile = core.getInput('log-file')
     core.info('Ending Tracee Commercial run')
     await executeTraceeEnd(verbose)
+    if (logFile) {
+      const log = fs.readFileSync(logFile, 'utf8')
+      core.info(log)
+    }
     core.debug('Tracee Commercial ended successfully')
   } catch (error) {
     if (error instanceof CommandError) {
