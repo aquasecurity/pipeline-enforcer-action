@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
+import {validateLogFilePath} from './inputs'
 
 class CommandError extends Error {
   exitCode: number
@@ -39,7 +40,7 @@ async function run(): Promise<void> {
     }
   } finally {
     const logFile = core.getInput('log-file')
-    if (logFile) {
+    if (logFile && validateLogFilePath(logFile)) {
       const log = fs.readFileSync(logFile, 'utf8')
       core.info(`Tracee Commercial logs`)
       core.info(log)
