@@ -4,15 +4,15 @@ import * as core from '@actions/core'
 import {exec} from '@actions/exec'
 import * as http from '@actions/http-client'
 import * as fs from 'fs'
+import {extractStartInputs} from './inputs'
+import {TraceeStartFlags} from './types'
 
+const TRACEE_INIT_FILE = '/tmp/tracee-ci.start'
+const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/tracee/install.sh'
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL =
   'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum'
-
-const INSTALLATION_SCRIPT_PATH = 'install.sh'
-
-const TRACEE_INIT_FILE = '/tmp/tracee-ci.start'
 
 const httpClient = new http.HttpClient('tracee-action')
 
@@ -70,17 +70,31 @@ const downloadTraceeCommercial = async () => {
   }
 }
 
-const executeTraceeInBackground = async (
-  repoPath: string,
-  aquaKey: string,
-  aquaSecret: string,
-  accessToken: string,
-  verbose: boolean = false
-) => {
+const generateCommand = (flags: TraceeStartFlags): string => {
+  const traceeCommand = ['./tracee', 'ci', 'start', '-r', `"${flags.repoPath}"`]
+
+  if (flags.verbose && !flags.quiet) {
+    traceeCommand.push('-v')
+  }
+
+  if (flags.quiet) {
+    traceeCommand.push('-q')
+  }
+
+  if (flags.logFile) {
+    traceeCommand.push('--log-file')
+    traceeCommand.push(`"${flags.logFile}"`)
+  }
+
+  traceeCommand.push('&')
+
+  return traceeCommand.join(' ')
+}
+
+const executeTraceeInBackground = async (traceeFlags: TraceeStartFlags) => {
+  const {aquaKey, aquaSecret, accessToken} = traceeFlags
   const command = 'bash'
-  const traceeCommand = `./tracee ci start -r "${repoPath}" ${
-    verbose ? '-v' : ''
-  } &`
+  const traceeCommand = generateCommand(traceeFlags)
   await exec(command, ['-c', traceeCommand], {
     env: {
       ...process.env,
@@ -118,22 +132,20 @@ async function run(): Promise<void> {
     await downloadTraceeCommercial()
     core.info('Tracee Commercial binary downloaded successfully')
 
-    let repoPath = core.getInput('repo-path')
-    if (repoPath === '') {
-      repoPath = '.'
-    }
+    // let repoPath = core.getInput('repo-path')
+    // if (repoPath === '') {
+    //   repoPath = '.'
+    // }
 
-    const verbose = core.getInput('verbose') === 'true'
+    // const verbose = core.getInput('verbose') === 'true'
+    // const quiet = core.getInput('quiet') === 'true'
+    // const logFile = core.getInput('log-file')
+    // const accessToken = core.getInput('access-token')
 
-    const accessToken = core.getInput('access-token')
+    const traceeFlags = extractStartInputs()
+
     core.debug('Starting Tracee Commercial in the background')
-    await executeTraceeInBackground(
-      repoPath,
-      aquaKey,
-      aquaSecret,
-      accessToken,
-      verbose
-    )
+    await executeTraceeInBackground(traceeFlags)
     core.info('Tracee Commercial started successfully')
 
     core.debug('Waiting for Tracee Commercial to initialize.')

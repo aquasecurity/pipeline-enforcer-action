@@ -17,9 +17,16 @@ inputs:
   repo-path:
     description: 'Path to the repository'
     required: false
-  verbose:
-    description: 'Print verbose logs'
+  quiet:
+    description: 'Print only errors'
     default: 'false'
+    required: false
+  verbose:
+    description: 'Print debug logs and above'
+    default: 'false'
+    required: false
+  log-file:
+    description: 'Path to the log file'
     required: false
 runs:
   using: 'node16'
