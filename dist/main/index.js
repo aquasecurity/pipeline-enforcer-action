@@ -104,8 +104,13 @@ const generateCommand = (flags) => {
         traceeCommand.push('-q');
     }
     if (flags.logFile) {
-        traceeCommand.push('--log-file');
-        traceeCommand.push(`"${flags.logFile}"`);
+        if ((0, inputs_1.validateLogFilePath)(flags.logFile)) {
+            traceeCommand.push('--log-file');
+            traceeCommand.push(`"${flags.logFile}"`);
+        }
+        else {
+            core.warning(`Log file path ${flags.logFile} is invalid. Ignoring log file flag`);
+        }
     }
     traceeCommand.push('&');
     return traceeCommand.join(' ');
@@ -138,19 +143,9 @@ const waitForTraceeToInitialize = (timeout, initFilePath) => {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const aquaKey = core.getInput('aqua-key');
-            const aquaSecret = core.getInput('aqua-secret');
             core.debug('Downloading Tracee Commercial binary');
             yield downloadTraceeCommercial();
             core.info('Tracee Commercial binary downloaded successfully');
-            // let repoPath = core.getInput('repo-path')
-            // if (repoPath === '') {
-            //   repoPath = '.'
-            // }
-            // const verbose = core.getInput('verbose') === 'true'
-            // const quiet = core.getInput('quiet') === 'true'
-            // const logFile = core.getInput('log-file')
-            // const accessToken = core.getInput('access-token')
             const traceeFlags = (0, inputs_1.extractStartInputs)();
             core.debug('Starting Tracee Commercial in the background');
             yield executeTraceeInBackground(traceeFlags);
@@ -200,8 +195,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.extractStartInputs = void 0;
+exports.validateLogFilePath = exports.extractStartInputs = void 0;
 const core = __importStar(__nccwpck_require__(186));
+const fs = __importStar(__nccwpck_require__(747));
+const path = __importStar(__nccwpck_require__(622));
 const extractStartInputs = () => {
     const repoPath = core.getInput('repo-path');
     return {
@@ -215,6 +212,19 @@ const extractStartInputs = () => {
     };
 };
 exports.extractStartInputs = extractStartInputs;
+const validateLogFilePath = (logFilePath) => {
+    // Check that the directory exists
+    const logFileDir = path.dirname(logFilePath);
+    if (!fs.existsSync(logFileDir)) {
+        return false;
+    }
+    // Check that the file does not exit
+    if (fs.existsSync(logFilePath)) {
+        return false;
+    }
+    return true;
+};
+exports.validateLogFilePath = validateLogFilePath;
 
 
 /***/ }),

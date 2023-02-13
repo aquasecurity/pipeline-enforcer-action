@@ -4,7 +4,7 @@ import * as core from '@actions/core'
 import {exec} from '@actions/exec'
 import * as http from '@actions/http-client'
 import * as fs from 'fs'
-import {extractStartInputs} from './inputs'
+import {extractStartInputs, validateLogFilePath} from './inputs'
 import {TraceeStartFlags} from './types'
 
 const TRACEE_INIT_FILE = '/tmp/tracee-ci.start'
@@ -82,8 +82,14 @@ const generateCommand = (flags: TraceeStartFlags): string => {
   }
 
   if (flags.logFile) {
-    traceeCommand.push('--log-file')
-    traceeCommand.push(`"${flags.logFile}"`)
+    if (validateLogFilePath(flags.logFile)) {
+      traceeCommand.push('--log-file')
+      traceeCommand.push(`"${flags.logFile}"`)
+    } else {
+      core.warning(
+        `Log file path ${flags.logFile} is invalid. Ignoring log file flag`
+      )
+    }
   }
 
   traceeCommand.push('&')
@@ -126,24 +132,10 @@ const waitForTraceeToInitialize = (timeout: number, initFilePath: string) => {
 
 async function run(): Promise<void> {
   try {
-    const aquaKey = core.getInput('aqua-key')
-    const aquaSecret = core.getInput('aqua-secret')
     core.debug('Downloading Tracee Commercial binary')
     await downloadTraceeCommercial()
     core.info('Tracee Commercial binary downloaded successfully')
-
-    // let repoPath = core.getInput('repo-path')
-    // if (repoPath === '') {
-    //   repoPath = '.'
-    // }
-
-    // const verbose = core.getInput('verbose') === 'true'
-    // const quiet = core.getInput('quiet') === 'true'
-    // const logFile = core.getInput('log-file')
-    // const accessToken = core.getInput('access-token')
-
     const traceeFlags = extractStartInputs()
-
     core.debug('Starting Tracee Commercial in the background')
     await executeTraceeInBackground(traceeFlags)
     core.info('Tracee Commercial started successfully')
