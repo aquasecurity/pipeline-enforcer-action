@@ -62,8 +62,13 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const verbose = core.getInput('verbose') === 'true';
+            const logFile = core.getInput('log-file');
             core.info('Ending Tracee Commercial run');
             yield executeTraceeEnd(verbose);
+            if (logFile) {
+                const log = fs.readFileSync(logFile, 'utf8');
+                core.info(log);
+            }
             core.debug('Tracee Commercial ended successfully');
         }
         catch (error) {
