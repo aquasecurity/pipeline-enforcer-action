@@ -1,69 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 180:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isLogFilePathValid = exports.extractStartInputs = void 0;
-const core = __importStar(__nccwpck_require__(186));
-const fs = __importStar(__nccwpck_require__(747));
-const path = __importStar(__nccwpck_require__(622));
-const extractStartInputs = () => {
-    const repoPath = core.getInput('repo-path');
-    return {
-        verbose: core.getInput('verbose') === 'true',
-        quiet: core.getInput('quiet') === 'true',
-        logFile: core.getInput('log-file'),
-        repoPath: repoPath || '.',
-        accessToken: core.getInput('access-token'),
-        aquaKey: core.getInput('aqua-key'),
-        aquaSecret: core.getInput('aqua-secret')
-    };
-};
-exports.extractStartInputs = extractStartInputs;
-const isLogFilePathValid = (logFilePath) => {
-    // Check that the directory exists
-    const logFileDir = path.dirname(logFilePath);
-    if (!fs.existsSync(logFileDir)) {
-        return false;
-    }
-    // Check that the file does not exit
-    if (fs.existsSync(logFilePath)) {
-        return false;
-    }
-    return true;
-};
-exports.isLogFilePathValid = isLogFilePathValid;
-
-
-/***/ }),
-
 /***/ 95:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -105,7 +42,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const fs = __importStar(__nccwpck_require__(747));
-const inputs_1 = __nccwpck_require__(180);
 const TRACEE_END_SLEEP_MS = 3000;
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class CommandError extends Error {
@@ -146,7 +82,7 @@ function run() {
         }
         finally {
             const logFile = core.getInput('log-file');
-            if (logFile && (0, inputs_1.isLogFilePathValid)(logFile)) {
+            if (logFile && fs.existsSync(logFile)) {
                 const log = fs.readFileSync(logFile, 'utf8');
                 core.info(`Tracee Commercial logs`);
                 core.info(log);

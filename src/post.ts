@@ -47,7 +47,7 @@ async function run(): Promise<void> {
     }
   } finally {
     const logFile = core.getInput('log-file')
-    if (logFile && isLogFilePathValid(logFile)) {
+    if (logFile && fs.existsSync(logFile)) {
       const log = fs.readFileSync(logFile, 'utf8')
       core.info(`Tracee Commercial logs`)
       core.info(log)
