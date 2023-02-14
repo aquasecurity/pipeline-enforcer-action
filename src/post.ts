@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
-import {validateLogFilePath} from './inputs'
+import {isLogFilePathValid} from './inputs'
 
 const TRACEE_END_SLEEP_MS = 3000
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -26,7 +26,7 @@ const executeTraceeEnd = async (verbose: boolean) => {
 
   const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`
 
-  const result = await getExecOutput('./tracee ci end')
+  const result = await getExecOutput(traceeCommand)
   if (result.exitCode != 0) {
     throw new CommandError(result.exitCode, result.stdout + result.stderr)
   }
@@ -47,7 +47,7 @@ async function run(): Promise<void> {
     }
   } finally {
     const logFile = core.getInput('log-file')
-    if (logFile && validateLogFilePath(logFile)) {
+    if (logFile && isLogFilePathValid(logFile)) {
       const log = fs.readFileSync(logFile, 'utf8')
       core.info(`Tracee Commercial logs`)
       core.info(log)

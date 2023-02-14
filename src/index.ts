@@ -4,7 +4,7 @@ import * as core from '@actions/core'
 import {exec} from '@actions/exec'
 import * as http from '@actions/http-client'
 import * as fs from 'fs'
-import {extractStartInputs, validateLogFilePath} from './inputs'
+import {extractStartInputs, isLogFilePathValid} from './inputs'
 import {TraceeStartFlags} from './types'
 
 const TRACEE_INIT_FILE = '/tmp/tracee-ci.start'
@@ -82,9 +82,8 @@ const generateCommand = (flags: TraceeStartFlags): string => {
   }
 
   if (flags.logFile) {
-    if (validateLogFilePath(flags.logFile)) {
-      traceeCommand.push('--log-file')
-      traceeCommand.push(`"${flags.logFile}"`)
+    if (isLogFilePathValid(flags.logFile)) {
+      traceeCommand.push('--log-file', `"${flags.logFile}"`)
     } else {
       core.warning(
         `Log file path ${flags.logFile} is invalid. Ignoring log file flag`
@@ -108,6 +107,7 @@ const executeTraceeInBackground = async (traceeFlags: TraceeStartFlags) => {
       AQUA_SECRET: aquaSecret,
       ACCESS_TOKEN: accessToken
     },
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     detached: true
   })

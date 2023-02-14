@@ -11,4 +11,4 @@ export type TraceeStartFlags = TraceeFlags & {
   accessToken: string
 }
 
-export type TraceeEndFlags = TraceeFlags & {}
+export type TraceeEndFlags = TraceeFlags & Record<string, never>

@@ -18,7 +18,7 @@ export const extractStartInputs = (): TraceeStartFlags => {
   }
 }
 
-export const validateLogFilePath = (logFilePath: string): boolean => {
+export const isLogFilePathValid = (logFilePath: string): boolean => {
   // Check that the directory exists
   const logFileDir = path.dirname(logFilePath)
   if (!fs.existsSync(logFileDir)) {

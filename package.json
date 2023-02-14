@@ -11,7 +11,7 @@
     "package:main": "ncc build lib/index.js -o dist/main/ --license licenses.txt",
     "package:post": "ncc build lib/post.js -o dist/post/ --license licenses.txt",
     "package": "concurrently 'npm:package:main' 'npm:package:post'",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "author": "Aqua Security",
@@ -23,8 +23,10 @@
   },
   "devDependencies": {
     "@types/node": "^18.11.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
     "@vercel/ncc": "^0.31.1",
+    "concurrently": "^4.1.0",
     "eslint": "^7.32.0",
     "eslint-plugin-github": "^4.3.2",
     "eslint-plugin-jest": "^25.3.2",
@@ -32,7 +34,6 @@
     "js-yaml": "^4.1.0",
     "prettier": "2.5.1",
     "ts-jest": "^27.1.2",
-    "concurrently": "^4.1.0",
     "typescript": "^4.4.4"
   }
 }

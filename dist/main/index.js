@@ -104,9 +104,8 @@ const generateCommand = (flags) => {
         traceeCommand.push('-q');
     }
     if (flags.logFile) {
-        if ((0, inputs_1.validateLogFilePath)(flags.logFile)) {
-            traceeCommand.push('--log-file');
-            traceeCommand.push(`"${flags.logFile}"`);
+        if ((0, inputs_1.isLogFilePathValid)(flags.logFile)) {
+            traceeCommand.push('--log-file', `"${flags.logFile}"`);
         }
         else {
             core.warning(`Log file path ${flags.logFile} is invalid. Ignoring log file flag`);
@@ -121,6 +120,7 @@ const executeTraceeInBackground = (traceeFlags) => __awaiter(void 0, void 0, voi
     const traceeCommand = generateCommand(traceeFlags);
     yield (0, exec_1.exec)(command, ['-c', traceeCommand], {
         env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         detached: true
     });
@@ -195,7 +195,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateLogFilePath = exports.extractStartInputs = void 0;
+exports.isLogFilePathValid = exports.extractStartInputs = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
@@ -212,7 +212,7 @@ const extractStartInputs = () => {
     };
 };
 exports.extractStartInputs = extractStartInputs;
-const validateLogFilePath = (logFilePath) => {
+const isLogFilePathValid = (logFilePath) => {
     // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);
     if (!fs.existsSync(logFileDir)) {
@@ -224,7 +224,7 @@ const validateLogFilePath = (logFilePath) => {
     }
     return true;
 };
-exports.validateLogFilePath = validateLogFilePath;
+exports.isLogFilePathValid = isLogFilePathValid;
 
 
 /***/ }),

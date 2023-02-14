@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateLogFilePath = exports.extractStartInputs = void 0;
+exports.isLogFilePathValid = exports.extractStartInputs = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
@@ -47,7 +47,7 @@ const extractStartInputs = () => {
     };
 };
 exports.extractStartInputs = extractStartInputs;
-const validateLogFilePath = (logFilePath) => {
+const isLogFilePathValid = (logFilePath) => {
     // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);
     if (!fs.existsSync(logFileDir)) {
@@ -59,7 +59,7 @@ const validateLogFilePath = (logFilePath) => {
     }
     return true;
 };
-exports.validateLogFilePath = validateLogFilePath;
+exports.isLogFilePathValid = isLogFilePathValid;
 
 
 /***/ }),
@@ -122,7 +122,7 @@ const executeTraceeEnd = (verbose) => __awaiter(void 0, void 0, void 0, function
     // we add a delay between the last step of the workflow and the tracee end command
     yield sleep(TRACEE_END_SLEEP_MS);
     const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`;
-    const result = yield (0, exec_1.getExecOutput)('./tracee ci end');
+    const result = yield (0, exec_1.getExecOutput)(traceeCommand);
     if (result.exitCode != 0) {
         throw new CommandError(result.exitCode, result.stdout + result.stderr);
     }
@@ -146,7 +146,7 @@ function run() {
         }
         finally {
             const logFile = core.getInput('log-file');
-            if (logFile && (0, inputs_1.validateLogFilePath)(logFile)) {
+            if (logFile && (0, inputs_1.isLogFilePathValid)(logFile)) {
                 const log = fs.readFileSync(logFile, 'utf8');
                 core.info(`Tracee Commercial logs`);
                 core.info(log);
