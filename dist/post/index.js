@@ -106,6 +106,8 @@ const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const fs = __importStar(__nccwpck_require__(747));
 const inputs_1 = __nccwpck_require__(180);
+const TRACEE_END_SLEEP_MS = 3000;
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class CommandError extends Error {
     constructor(exitCode, message) {
         super(message);
@@ -116,8 +118,11 @@ const executeTraceeEnd = (verbose) => __awaiter(void 0, void 0, void 0, function
     if (!fs.existsSync('./tracee')) {
         throw new Error('Tracee Commercial was not found');
     }
+    // workaround for tracee end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
+    // we add a delay between the last step of the workflow and the tracee end command
+    yield sleep(TRACEE_END_SLEEP_MS);
     const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`;
-    const result = yield (0, exec_1.getExecOutput)(traceeCommand);
+    const result = yield (0, exec_1.getExecOutput)('./tracee ci end');
     if (result.exitCode != 0) {
         throw new CommandError(result.exitCode, result.stdout + result.stderr);
     }

@@ -3,6 +3,9 @@ import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
 import {validateLogFilePath} from './inputs'
 
+const TRACEE_END_SLEEP_MS = 3000
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 class CommandError extends Error {
   exitCode: number
 
@@ -17,9 +20,13 @@ const executeTraceeEnd = async (verbose: boolean) => {
     throw new Error('Tracee Commercial was not found')
   }
 
+  // workaround for tracee end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
+  // we add a delay between the last step of the workflow and the tracee end command
+  await sleep(TRACEE_END_SLEEP_MS)
+
   const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`
 
-  const result = await getExecOutput(traceeCommand)
+  const result = await getExecOutput('./tracee ci end')
   if (result.exitCode != 0) {
     throw new CommandError(result.exitCode, result.stdout + result.stderr)
   }
