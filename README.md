@@ -1,8 +1,6 @@
 # Aqua Pipeline Security
 
-This action is used to protect your GitHub workflows by generating an activity profile of your workflow job using Aqua Security's [Tracee](https://github.com/aquasecurity/tracee).
-The profile provides visibility of your workflow jobs activity and allows you to enforce policies from Aqua platform.
-To use this action, you need to have an Aqua account and generate a key and a secret from Aqua platform.
+The Aqua Pipeline Security action protects GitHub workflows by generating an activity profile of the workflow job using Aqua Security's [Tracee](https://github.com/aquasecurity/tracee). This action allows gaining both visibility of the workflow jobs activity, and to policies enforcement over the Aqua platform. To use this action, it is required to have an Aqua account in addition to a key and a secret generated over the platform.
 
 Open source version of this action is available [here](https://github.com/aquasecurity/tracee-action).
 
@@ -10,8 +8,8 @@ Open source version of this action is available [here](https://github.com/aquase
 
 ## Table of Contents
 
-- [Threats](#threats)
-- [Protection](#protection)
+- [Threats Protection](#threats-protection)
+- [Protection Methods](#protection-methods)
   - [Activity Profiling](#activity-profiling)
   - [Suspicious Behavior Detection](#suspicious-behavior-detection)
 - [Usage](#usage)
@@ -19,25 +17,25 @@ Open source version of this action is available [here](https://github.com/aquase
 
 ---
 
-## Threats
+## Threats Protection
 
 By using this action, you protect your workflow jobs from the following threats:
 
-|     | Threat                | Description                                                                                                                                                 | Examples                                                                                                                           |
-| --- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1.  | Secrets exfiltration  | Malicious packages or pipeline dependencies might steal your secrets by making a network call with your pipeline secrets                                    | [Codecov breach](https://blog.aquasec.com/codecovs-breach-supply-chain-attack)                                                     |
-| 2.  | Source code tampering | Malicious dependencies or compromised runner might edit your source code before the artifact is being built to inject a backdoor or insert a malicious code | [Solarwinds incident](https://www.aquasec.com/cloud-native-academy/supply-chain-security/solarwinds-attack/)                       |
-| 3.  | Compromised Runner    | Your runner might be breached, and is running a malware or a crypto miner                                                                                   | [Crypto mining in the CI](https://blog.aquasec.com/container-security-alert-campaign-abusing-github-dockerhub-travis-ci-circle-ci) |
+|     | Threat                | Description                                                                                                                                         | Examples                                                                                                                           |
+| --- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1.  | Secrets exfiltration  | Malicious packages or pipeline dependencies stealing secrets by making a network call using pipeline secrets                                        | [Codecov breach](https://blog.aquasec.com/codecovs-breach-supply-chain-attack)                                                     |
+| 2.  | Source code tampering | Malicious dependencies or compromised runner editing source code before the artifact is being built to inject a backdoor or insert a malicious code | [Solarwinds incident](https://www.aquasec.com/cloud-native-academy/supply-chain-security/solarwinds-attack/)                       |
+| 3.  | Compromised Runner    | A breached runner running a malware or a crypto miner                                                                                               | [Crypto mining in the CI](https://blog.aquasec.com/container-security-alert-campaign-abusing-github-dockerhub-travis-ci-circle-ci) |
 
 ---
 
-## Protection
+## Protection Methods
 
 The protection is being made by 2 main components. All the data is being sent to Aqua platform, and is being used to enforce policies.
 
 ### Activity Profiling
 
-The action generates a profile of your workflow job, and sends it to Aqua platform. The profile includes the following data:
+Protection is done by having an ongoing Activity Profiling and a Suspicions Behavior Detection. This requires sending all data through the Aqua platform for analysis and to enforce policies.
 
 1. Network calls - a list of all the network calls made during the pipeline execution.
 2. Repository filesystem changes - a list of all the changes that are made inside the repository file system (source code, package managers etc.) during the pipeline execution.
@@ -111,7 +109,7 @@ jobs:
 ---
 
 Tracee is an [Aqua Security] open source project.
-Learn about our open source work and portfolio [Here].
+Learn about our open source work and portfolio [here].
 Join the community, and talk to us about any matter in [GitHub Discussion] or [Slack].
 
 [aqua security]: https://aquasec.com
