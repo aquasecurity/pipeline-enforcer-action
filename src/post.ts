@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
-import {isLogFilePathValid} from './inputs'
 
 const TRACEE_END_SLEEP_MS = 3000
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
