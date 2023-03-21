@@ -48,11 +48,11 @@ const exec_1 = __nccwpck_require__(514);
 const http = __importStar(__nccwpck_require__(255));
 const fs = __importStar(__nccwpck_require__(747));
 const inputs_1 = __nccwpck_require__(180);
-const TRACEE_INIT_FILE = '/tmp/tracee-ci.start';
+const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
-const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/tracee/install.sh';
+const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
-const httpClient = new http.HttpClient('tracee-action');
+const httpClient = new http.HttpClient('pipeline-enforcer-action');
 const downloadToFile = (url, filePath) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield httpClient.get(url);
     const responseBody = yield response.readBody();
@@ -76,7 +76,7 @@ const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, functi
         env: Object.assign(Object.assign({}, process.env), { BINDIR: '.' })
     });
 });
-const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
+const downloadPipelineEnforcerCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
     yield downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
     const expectedChecksum = yield getChecksum();
     const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH);
@@ -96,63 +96,69 @@ const downloadTraceeCommercial = () => __awaiter(void 0, void 0, void 0, functio
     }
 });
 const generateCommand = (flags) => {
-    const traceeCommand = ['./tracee', 'ci', 'start', '-r', `"${flags.repoPath}"`];
+    const pipelineEnforcerCommand = [
+        './pipeline-enforcer',
+        'ci',
+        'start',
+        '-r',
+        `"${flags.repoPath}"`
+    ];
     if (flags.verbose && !flags.quiet) {
-        traceeCommand.push('-v');
+        pipelineEnforcerCommand.push('-v');
     }
     if (flags.quiet) {
-        traceeCommand.push('-q');
+        pipelineEnforcerCommand.push('-q');
     }
     if (flags.logFile) {
         if ((0, inputs_1.isLogFilePathValid)(flags.logFile)) {
-            traceeCommand.push('--log-file', `"${flags.logFile}"`);
+            pipelineEnforcerCommand.push('--log-file', `"${flags.logFile}"`);
         }
         else {
             core.warning(`Log file path ${flags.logFile} is invalid. Ignoring log file flag`);
         }
     }
-    traceeCommand.push('&');
-    return traceeCommand.join(' ');
+    pipelineEnforcerCommand.push('&');
+    return pipelineEnforcerCommand.join(' ');
 };
-const executeTraceeInBackground = (traceeFlags) => __awaiter(void 0, void 0, void 0, function* () {
-    const { aquaKey, aquaSecret, accessToken } = traceeFlags;
+const executePipelineEnforcerInBackground = (pipelineEnforcerFlags) => __awaiter(void 0, void 0, void 0, function* () {
+    const { aquaKey, aquaSecret, accessToken } = pipelineEnforcerFlags;
     const command = 'bash';
-    const traceeCommand = generateCommand(traceeFlags);
-    yield (0, exec_1.exec)(command, ['-c', traceeCommand], {
+    const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags);
+    yield (0, exec_1.exec)(command, ['-c', pipelineEnforcerCommand], {
         env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret, ACCESS_TOKEN: accessToken }),
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         detached: true
     });
 });
-const waitForTraceeToInitialize = (timeout, initFilePath) => {
+const waitForPipelineEnforcerToInitialize = (timeout, initFilePath) => {
     return new Promise((resolve, reject) => {
         const interval = setInterval(() => {
             if (fs.existsSync(initFilePath)) {
-                core.debug(`Found Tracee init file: ${initFilePath}`);
+                core.debug(`Found pipeline-enforcer init file: ${initFilePath}`);
                 clearInterval(interval);
                 resolve();
             }
         }, 1000);
         setTimeout(() => {
             clearInterval(interval);
-            reject(new Error('Timeout waiting for Tracee to initialize'));
+            reject(new Error('Timeout waiting for pipeline-enforcer to initialize'));
         }, timeout);
     });
 };
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.debug('Downloading Tracee Commercial binary');
-            yield downloadTraceeCommercial();
-            core.info('Tracee Commercial binary downloaded successfully');
-            const traceeFlags = (0, inputs_1.extractStartInputs)();
-            core.debug('Starting Tracee Commercial in the background');
-            yield executeTraceeInBackground(traceeFlags);
-            core.info('Tracee Commercial started successfully');
-            core.debug('Waiting for Tracee Commercial to initialize.');
-            yield waitForTraceeToInitialize(30000, TRACEE_INIT_FILE);
-            core.info('Tracee Commercial initialized successfully');
+            core.debug('Downloading pipeline-enforcer binary');
+            yield downloadPipelineEnforcerCommercial();
+            core.info('pipeline-enforcer binary downloaded successfully');
+            const pipelineEnforcerFlags = (0, inputs_1.extractStartInputs)();
+            core.debug('Starting pipeline-enforcer in the background');
+            yield executePipelineEnforcerInBackground(pipelineEnforcerFlags);
+            core.info('pipeline-enforcer started successfully');
+            core.debug('Waiting for pipeline-enforcer to initialize.');
+            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE);
+            core.info('pipeline-enforcer initialized successfully');
         }
         catch (error) {
             if (error instanceof Error) {

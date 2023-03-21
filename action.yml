@@ -1,4 +1,4 @@
-name: Tracee Commercial Action
+name: Pipeline Enforcer Action
 description: |
   This action is used to protect your GitHub workflows by generating a profile of your workflow job using Aqua Security's Tracee.
   The profile provides visibility of your workflow jobs and allows you to enforce policies from Aqua platform.

@@ -1,14 +1,15 @@
-export type TraceeFlags = {
+export type PipelineEnforcerFlags = {
   verbose?: boolean
   quiet?: boolean
   logFile?: string
 }
 
-export type TraceeStartFlags = TraceeFlags & {
+export type PipelineEnforcerStartFlags = PipelineEnforcerFlags & {
   repoPath: string
   aquaKey: string
   aquaSecret: string
   accessToken: string
 }
 
-export type TraceeEndFlags = TraceeFlags & Record<string, never>
+export type PipelineEnforcerEndFlags = PipelineEnforcerFlags &
+  Record<string, never>

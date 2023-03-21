@@ -1,6 +1,6 @@
-# Aqua Pipeline Security
+# Pipeline Enforcer Action
 
-The Aqua Pipeline Security action protects GitHub workflows by generating an activity profile of the workflow job using Aqua Security's [Tracee](https://github.com/aquasecurity/tracee). This action allows gaining both visibility of the workflow jobs activity, and to policies enforcement over the Aqua platform. To use this action, it is required to have an Aqua account in addition to a key and a secret generated over the platform.
+The Pipeline Enforcer Action protects GitHub workflows by generating an activity profile of the workflow job using Aqua Security's [Tracee](https://github.com/aquasecurity/tracee). This action allows gaining both visibility of the workflow jobs activity, and to policies enforcement over the Aqua platform. To use this action, it is required to have an Aqua account in addition to a key and a secret generated over the platform.
 
 Open source version of this action is available [here](https://github.com/aquasecurity/tracee-action).
 
@@ -40,6 +40,7 @@ Protection is done by having an ongoing Activity Profiling and a Suspicions Beha
 1. Network calls - a list of all the network calls made during the pipeline execution.
 2. Repository filesystem changes - a list of all the changes that are made inside the repository file system (source code, package managers etc.) during the pipeline execution.
 3. Containers executions - a list of all the containers that were executed during the pipeline execution.
+4. Process executions - a list of all the processes that were executed during the pipeline execution.
 
 ### Suspicious Behavior Detection
 
@@ -60,8 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Tracee
-        uses: aquasecurity/trace-commercial-action@v1
+      - name: Pipeline Enforcer
+        uses: aquasecurity/pipeline-enforcer-action@v1.0.0
         with:
           aqua-key: ${{ secrets.AQUA_KEY }}
           aqua-secret: ${{ secrets.AQUA_SECRET }}
@@ -82,8 +83,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         path: my-repo
-    - name: Tracee
-      uses: aquasecurity/trace-commercial-action@v1
+    - name: Pipeline Enforcer
+      uses: aquasecurity/pipeline-enforcer-action@v1.0.0
       with:
         aqua-key: ${{ secrets.AQUA_KEY }}
         aqua-secret: ${{ secrets.AQUA_SECRET }}
