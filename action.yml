@@ -1,8 +1,5 @@
 name: Pipeline Enforcer Action
-description: |
-  This action is used to protect your GitHub workflows by generating a profile of your workflow job using Aqua Security's Tracee.
-  The profile provides visibility of your workflow jobs and allows you to enforce policies from Aqua platform.
-  To use this action, you need to have an Aqua account and generate a key and a secret from Aqua platform.
+description: This action protects your GitHub workflows by generating a profile of your workflow job activity and enforcing policies on it
 inputs:
   access-token:
     description: 'SCM access token'
