@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const fs = __importStar(__nccwpck_require__(747));
-const TRACEE_END_SLEEP_MS = 3000;
+const PIPELINE_ENFORCER_END_SLEEP_MS = 3000;
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class CommandError extends Error {
     constructor(exitCode, message) {
@@ -50,15 +50,15 @@ class CommandError extends Error {
         this.exitCode = exitCode;
     }
 }
-const executeTraceeEnd = (verbose) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!fs.existsSync('./tracee')) {
-        throw new Error('Tracee Commercial was not found');
+const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!fs.existsSync('./pipeline-enforcer')) {
+        throw new Error('pipeline-enforcer was not found');
     }
-    // workaround for tracee end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
-    // we add a delay between the last step of the workflow and the tracee end command
-    yield sleep(TRACEE_END_SLEEP_MS);
-    const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`;
-    const result = yield (0, exec_1.getExecOutput)(traceeCommand);
+    // workaround for pipeline-enforcer end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
+    // we add a delay between the last step of the workflow and the pipeline-enforcer end command
+    yield sleep(PIPELINE_ENFORCER_END_SLEEP_MS);
+    const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
+    const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand);
     if (result.exitCode != 0) {
         throw new CommandError(result.exitCode, result.stdout + result.stderr);
     }
@@ -67,9 +67,9 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const verbose = core.getInput('verbose') === 'true';
-            core.info('Ending Tracee Commercial run');
-            yield executeTraceeEnd(verbose);
-            core.debug('Tracee Commercial ended successfully');
+            core.info('Ending pipeline-enforcer run');
+            yield executePipelineEnforcerEnd(verbose);
+            core.debug('pipeline-enforcer ended successfully');
         }
         catch (error) {
             if (error instanceof CommandError) {
@@ -84,7 +84,7 @@ function run() {
             const logFile = core.getInput('log-file');
             if (logFile && fs.existsSync(logFile)) {
                 const log = fs.readFileSync(logFile, 'utf8');
-                core.info(`Tracee Commercial logs`);
+                core.info(`pipeline-enforcer logs`);
                 core.info(log);
             }
         }

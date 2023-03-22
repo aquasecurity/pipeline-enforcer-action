@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
 
-const TRACEE_END_SLEEP_MS = 3000
+const PIPELINE_ENFORCER_END_SLEEP_MS = 3000
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 class CommandError extends Error {
@@ -14,18 +14,20 @@ class CommandError extends Error {
   }
 }
 
-const executeTraceeEnd = async (verbose: boolean) => {
-  if (!fs.existsSync('./tracee')) {
-    throw new Error('Tracee Commercial was not found')
+const executePipelineEnforcerEnd = async (verbose: boolean) => {
+  if (!fs.existsSync('./pipeline-enforcer')) {
+    throw new Error('pipeline-enforcer was not found')
   }
 
-  // workaround for tracee end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
-  // we add a delay between the last step of the workflow and the tracee end command
-  await sleep(TRACEE_END_SLEEP_MS)
+  // workaround for pipeline-enforcer end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
+  // we add a delay between the last step of the workflow and the pipeline-enforcer end command
+  await sleep(PIPELINE_ENFORCER_END_SLEEP_MS)
 
-  const traceeCommand = `./tracee ci end ${verbose ? '-v' : ''}`
+  const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${
+    verbose ? '-v' : ''
+  }`
 
-  const result = await getExecOutput(traceeCommand)
+  const result = await getExecOutput(pipelineEnforcerCommand)
   if (result.exitCode != 0) {
     throw new CommandError(result.exitCode, result.stdout + result.stderr)
   }
@@ -34,9 +36,9 @@ const executeTraceeEnd = async (verbose: boolean) => {
 async function run(): Promise<void> {
   try {
     const verbose = core.getInput('verbose') === 'true'
-    core.info('Ending Tracee Commercial run')
-    await executeTraceeEnd(verbose)
-    core.debug('Tracee Commercial ended successfully')
+    core.info('Ending pipeline-enforcer run')
+    await executePipelineEnforcerEnd(verbose)
+    core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
     if (error instanceof CommandError) {
       core.setFailed(error.message)
@@ -48,7 +50,7 @@ async function run(): Promise<void> {
     const logFile = core.getInput('log-file')
     if (logFile && fs.existsSync(logFile)) {
       const log = fs.readFileSync(logFile, 'utf8')
-      core.info(`Tracee Commercial logs`)
+      core.info(`pipeline-enforcer logs`)
       core.info(log)
     }
   }

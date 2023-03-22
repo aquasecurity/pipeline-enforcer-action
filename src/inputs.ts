@@ -2,9 +2,9 @@ import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as path from 'path'
 
-import {TraceeStartFlags} from './types'
+import {PipelineEnforcerStartFlags} from './types'
 
-export const extractStartInputs = (): TraceeStartFlags => {
+export const extractStartInputs = (): PipelineEnforcerStartFlags => {
   const repoPath = core.getInput('repo-path')
 
   return {

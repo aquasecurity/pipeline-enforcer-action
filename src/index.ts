@@ -5,16 +5,16 @@ import {exec} from '@actions/exec'
 import * as http from '@actions/http-client'
 import * as fs from 'fs'
 import {extractStartInputs, isLogFilePathValid} from './inputs'
-import {TraceeStartFlags} from './types'
+import {PipelineEnforcerStartFlags} from './types'
 
-const TRACEE_INIT_FILE = '/tmp/tracee-ci.start'
+const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start'
 const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
-  'https://download.codesec.aquasec.com/tracee/install.sh'
+  'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh'
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL =
   'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum'
 
-const httpClient = new http.HttpClient('tracee-action')
+const httpClient = new http.HttpClient('pipeline-enforcer-action')
 
 const downloadToFile = async (url: string, filePath: string) => {
   const response = await httpClient.get(url)
@@ -48,7 +48,7 @@ const executeInstallationScript = async () => {
   })
 }
 
-const downloadTraceeCommercial = async () => {
+const downloadPipelineEnforcerCommercial = async () => {
   await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
   const expectedChecksum = await getChecksum()
   const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
@@ -70,20 +70,26 @@ const downloadTraceeCommercial = async () => {
   }
 }
 
-const generateCommand = (flags: TraceeStartFlags): string => {
-  const traceeCommand = ['./tracee', 'ci', 'start', '-r', `"${flags.repoPath}"`]
+const generateCommand = (flags: PipelineEnforcerStartFlags): string => {
+  const pipelineEnforcerCommand = [
+    './pipeline-enforcer',
+    'ci',
+    'start',
+    '-r',
+    `"${flags.repoPath}"`
+  ]
 
   if (flags.verbose && !flags.quiet) {
-    traceeCommand.push('-v')
+    pipelineEnforcerCommand.push('-v')
   }
 
   if (flags.quiet) {
-    traceeCommand.push('-q')
+    pipelineEnforcerCommand.push('-q')
   }
 
   if (flags.logFile) {
     if (isLogFilePathValid(flags.logFile)) {
-      traceeCommand.push('--log-file', `"${flags.logFile}"`)
+      pipelineEnforcerCommand.push('--log-file', `"${flags.logFile}"`)
     } else {
       core.warning(
         `Log file path ${flags.logFile} is invalid. Ignoring log file flag`
@@ -91,16 +97,18 @@ const generateCommand = (flags: TraceeStartFlags): string => {
     }
   }
 
-  traceeCommand.push('&')
+  pipelineEnforcerCommand.push('&')
 
-  return traceeCommand.join(' ')
+  return pipelineEnforcerCommand.join(' ')
 }
 
-const executeTraceeInBackground = async (traceeFlags: TraceeStartFlags) => {
-  const {aquaKey, aquaSecret, accessToken} = traceeFlags
+const executePipelineEnforcerInBackground = async (
+  pipelineEnforcerFlags: PipelineEnforcerStartFlags
+) => {
+  const {aquaKey, aquaSecret, accessToken} = pipelineEnforcerFlags
   const command = 'bash'
-  const traceeCommand = generateCommand(traceeFlags)
-  await exec(command, ['-c', traceeCommand], {
+  const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags)
+  await exec(command, ['-c', pipelineEnforcerCommand], {
     env: {
       ...process.env,
       AQUA_KEY: aquaKey,
@@ -113,11 +121,14 @@ const executeTraceeInBackground = async (traceeFlags: TraceeStartFlags) => {
   })
 }
 
-const waitForTraceeToInitialize = (timeout: number, initFilePath: string) => {
+const waitForPipelineEnforcerToInitialize = (
+  timeout: number,
+  initFilePath: string
+) => {
   return new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
       if (fs.existsSync(initFilePath)) {
-        core.debug(`Found Tracee init file: ${initFilePath}`)
+        core.debug(`Found pipeline-enforcer init file: ${initFilePath}`)
         clearInterval(interval)
         resolve()
       }
@@ -125,24 +136,27 @@ const waitForTraceeToInitialize = (timeout: number, initFilePath: string) => {
 
     setTimeout(() => {
       clearInterval(interval)
-      reject(new Error('Timeout waiting for Tracee to initialize'))
+      reject(new Error('Timeout waiting for pipeline-enforcer to initialize'))
     }, timeout)
   })
 }
 
 async function run(): Promise<void> {
   try {
-    core.debug('Downloading Tracee Commercial binary')
-    await downloadTraceeCommercial()
-    core.info('Tracee Commercial binary downloaded successfully')
-    const traceeFlags = extractStartInputs()
-    core.debug('Starting Tracee Commercial in the background')
-    await executeTraceeInBackground(traceeFlags)
-    core.info('Tracee Commercial started successfully')
+    core.debug('Downloading pipeline-enforcer binary')
+    await downloadPipelineEnforcerCommercial()
+    core.info('pipeline-enforcer binary downloaded successfully')
+    const pipelineEnforcerFlags = extractStartInputs()
+    core.debug('Starting pipeline-enforcer in the background')
+    await executePipelineEnforcerInBackground(pipelineEnforcerFlags)
+    core.info('pipeline-enforcer started successfully')
 
-    core.debug('Waiting for Tracee Commercial to initialize.')
-    await waitForTraceeToInitialize(30000, TRACEE_INIT_FILE)
-    core.info('Tracee Commercial initialized successfully')
+    core.debug('Waiting for pipeline-enforcer to initialize.')
+    await waitForPipelineEnforcerToInitialize(
+      30000,
+      PIPELINE_ENFORCER_INIT_FILE
+    )
+    core.info('pipeline-enforcer initialized successfully')
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
