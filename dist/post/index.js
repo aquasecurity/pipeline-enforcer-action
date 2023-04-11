@@ -42,8 +42,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const fs = __importStar(__nccwpck_require__(747));
-const PIPELINE_ENFORCER_END_SLEEP_MS = 3000;
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class CommandError extends Error {
     constructor(exitCode, message) {
         super(message);
@@ -54,9 +52,6 @@ const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0
     if (!fs.existsSync('./pipeline-enforcer')) {
         throw new Error('pipeline-enforcer was not found');
     }
-    // workaround for pipeline-enforcer end cmd buffer tail issue: https://github.com/aquasecurity/tracee/issues/2171
-    // we add a delay between the last step of the workflow and the pipeline-enforcer end command
-    yield sleep(PIPELINE_ENFORCER_END_SLEEP_MS);
     const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
     const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand);
     if (result.exitCode != 0) {
