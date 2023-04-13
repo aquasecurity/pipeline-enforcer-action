@@ -55,10 +55,10 @@ const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0
     const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
     const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand);
     if (result.exitCode != 0) {
-        console.error('pipeline-enforcer failed:');
-        console.error(result.stdout);
-        console.error(result.stderr);
-        console.error('throwing error');
+        core.error('pipeline-enforcer failed:');
+        core.error(result.stdout);
+        core.error(result.stderr);
+        core.error('throwing error');
         throw new CommandError(result.exitCode, result.stdout + result.stderr);
     }
 });
