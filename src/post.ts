@@ -22,6 +22,10 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
 
   const result = await getExecOutput(pipelineEnforcerCommand)
   if (result.exitCode != 0) {
+    console.error('pipeline-enforcer failed:')
+    console.error(result.stdout)
+    console.error(result.stderr)
+    console.error('throwing error')
     throw new CommandError(result.exitCode, result.stdout + result.stderr)
   }
 }
