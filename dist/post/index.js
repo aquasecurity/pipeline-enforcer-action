@@ -48,21 +48,26 @@ class CommandError extends Error {
         this.exitCode = exitCode;
     }
 }
+const addSummary = (summary) => __awaiter(void 0, void 0, void 0, function* () {
+    const lines = summary.split('\n');
+    core.summary.addHeading('Aqua Security Pipeline Enforcer').addSeparator();
+    for (const line of lines) {
+        if (line.startsWith('20')) {
+            continue;
+        }
+        core.summary.addRaw(line, true);
+    }
+    core.summary.addSeparator();
+    yield core.summary.write();
+});
 const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0, function* () {
     if (!fs.existsSync('./pipeline-enforcer')) {
         throw new Error('pipeline-enforcer was not found');
     }
     const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
-    core.info('Executing pipeline-enforcer ci end');
     const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand, [], {
         ignoreReturnCode: true
     });
-    core.info('pipeline-enforcer failed:');
-    core.info('stdout');
-    core.info(result.stdout);
-    core.info('stderr');
-    core.info(result.stderr);
-    core.info('throwing error');
     if (result.exitCode != 0) {
         throw new CommandError(result.exitCode, result.stdout + result.stderr);
     }
@@ -76,15 +81,12 @@ function run() {
             core.debug('pipeline-enforcer ended successfully');
         }
         catch (error) {
-            core.info('pipeline-enforcer thrown error');
             if (error instanceof CommandError) {
-                core.info('command error');
-                core.info(error.message);
+                yield addSummary(error.message);
                 core.setFailed(error.message);
                 process.exitCode = error.exitCode;
             }
             else if (error instanceof Error) {
-                core.info('error');
                 core.setFailed(error.message);
             }
         }

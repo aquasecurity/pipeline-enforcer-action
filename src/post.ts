@@ -11,6 +11,20 @@ class CommandError extends Error {
   }
 }
 
+const addSummary = async (summary: string) => {
+  const lines = summary.split('\n')
+  core.summary.addHeading('Aqua Security Pipeline Enforcer').addSeparator()
+  for (const line of lines) {
+    if (line.startsWith('20')) {
+      continue
+    }
+    core.summary.addRaw(line, true)
+  }
+  core.summary.addSeparator()
+
+  await core.summary.write()
+}
+
 const executePipelineEnforcerEnd = async (verbose: boolean) => {
   if (!fs.existsSync('./pipeline-enforcer')) {
     throw new Error('pipeline-enforcer was not found')
@@ -20,16 +34,10 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
     verbose ? '-v' : ''
   }`
 
-  core.info('Executing pipeline-enforcer ci end')
   const result = await getExecOutput(pipelineEnforcerCommand, [], {
     ignoreReturnCode: true
   })
-  core.info('pipeline-enforcer failed:')
-  core.info('stdout')
-  core.info(result.stdout)
-  core.info('stderr')
-  core.info(result.stderr)
-  core.info('throwing error')
+
   if (result.exitCode != 0) {
     throw new CommandError(result.exitCode, result.stdout + result.stderr)
   }
@@ -42,14 +50,11 @@ async function run(): Promise<void> {
     await executePipelineEnforcerEnd(verbose)
     core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
-    core.info('pipeline-enforcer thrown error')
     if (error instanceof CommandError) {
-      core.info('command error')
-      core.info(error.message)
+      await addSummary(error.message)
       core.setFailed(error.message)
       process.exitCode = error.exitCode
     } else if (error instanceof Error) {
-      core.info('error')
       core.setFailed(error.message)
     }
   } finally {
