@@ -21,7 +21,9 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
   }`
 
   core.info('Executing pipeline-enforcer ci end')
-  const result = await getExecOutput(pipelineEnforcerCommand)
+  const result = await getExecOutput(pipelineEnforcerCommand, [], {
+    ignoreReturnCode: true
+  })
   core.info('pipeline-enforcer failed:')
   core.info(result.stdout)
   core.info(result.stderr)
