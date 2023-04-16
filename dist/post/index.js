@@ -54,7 +54,9 @@ const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0
     }
     const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
     core.info('Executing pipeline-enforcer ci end');
-    const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand);
+    const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand, [], {
+        ignoreReturnCode: true
+    });
     core.info('pipeline-enforcer failed:');
     core.info(result.stdout);
     core.info(result.stderr);
