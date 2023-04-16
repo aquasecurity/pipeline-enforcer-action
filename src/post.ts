@@ -20,6 +20,7 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
     verbose ? '-v' : ''
   }`
 
+  core.info('Executing pipeline-enforcer ci end')
   const result = await getExecOutput(pipelineEnforcerCommand)
   core.info('pipeline-enforcer failed:')
   core.info(result.stdout)
@@ -37,6 +38,7 @@ async function run(): Promise<void> {
     await executePipelineEnforcerEnd(verbose)
     core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
+    core.info('pipeline-enforcer thrown error')
     if (error instanceof CommandError) {
       core.setFailed(error.message)
       process.exitCode = error.exitCode

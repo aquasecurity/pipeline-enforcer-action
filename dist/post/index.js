@@ -53,6 +53,7 @@ const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0
         throw new Error('pipeline-enforcer was not found');
     }
     const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
+    core.info('Executing pipeline-enforcer ci end');
     const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand);
     core.info('pipeline-enforcer failed:');
     core.info(result.stdout);
@@ -71,6 +72,7 @@ function run() {
             core.debug('pipeline-enforcer ended successfully');
         }
         catch (error) {
+            core.info('pipeline-enforcer thrown error');
             if (error instanceof CommandError) {
                 core.setFailed(error.message);
                 process.exitCode = error.exitCode;
