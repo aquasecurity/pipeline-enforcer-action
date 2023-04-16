@@ -55,7 +55,7 @@ const addSummary = (summary) => __awaiter(void 0, void 0, void 0, function* () {
         if (line.startsWith('20')) {
             continue;
         }
-        core.summary.addRaw(line, true);
+        core.summary.addRaw(line, true).addEOL();
     }
     core.summary.addSeparator();
     yield core.summary.write();

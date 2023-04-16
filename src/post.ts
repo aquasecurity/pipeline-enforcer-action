@@ -18,7 +18,7 @@ const addSummary = async (summary: string) => {
     if (line.startsWith('20')) {
       continue
     }
-    core.summary.addRaw(line, true)
+    core.summary.addRaw(line, true).addEOL()
   }
   core.summary.addSeparator()
 
