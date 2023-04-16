@@ -74,10 +74,13 @@ function run() {
         catch (error) {
             core.info('pipeline-enforcer thrown error');
             if (error instanceof CommandError) {
+                core.info('command error');
+                core.info(error.message);
                 core.setFailed(error.message);
                 process.exitCode = error.exitCode;
             }
             else if (error instanceof Error) {
+                core.info('error');
                 core.setFailed(error.message);
             }
         }
