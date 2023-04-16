@@ -25,7 +25,9 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
     ignoreReturnCode: true
   })
   core.info('pipeline-enforcer failed:')
+  core.info('stdout')
   core.info(result.stdout)
+  core.info('stderr')
   core.info(result.stderr)
   core.info('throwing error')
   if (result.exitCode != 0) {

@@ -58,7 +58,9 @@ const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0
         ignoreReturnCode: true
     });
     core.info('pipeline-enforcer failed:');
+    core.info('stdout');
     core.info(result.stdout);
+    core.info('stderr');
     core.info(result.stderr);
     core.info('throwing error');
     if (result.exitCode != 0) {
