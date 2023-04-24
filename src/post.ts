@@ -51,8 +51,12 @@ async function run(): Promise<void> {
     core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
     if (error instanceof CommandError) {
-      await addSummary(error.message)
-      core.setFailed(error.message)
+      // await addSummary(error.message)
+      if (error.exitCode == 13) {
+        core.setFailed(
+          'Aqua Security Pipeline Enforcer - assurance policies failed'
+        )
+      }
       process.exitCode = error.exitCode
     } else if (error instanceof Error) {
       core.setFailed(error.message)
