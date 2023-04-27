@@ -48,18 +48,6 @@ class CommandError extends Error {
         this.exitCode = exitCode;
     }
 }
-const addSummary = (summary) => __awaiter(void 0, void 0, void 0, function* () {
-    const lines = summary.split('\n');
-    core.summary.addHeading('Aqua Security Pipeline Enforcer').addSeparator();
-    for (const line of lines) {
-        if (line.startsWith('20')) {
-            continue;
-        }
-        core.summary.addRaw(line, true).addEOL();
-    }
-    core.summary.addSeparator();
-    yield core.summary.write();
-});
 const executePipelineEnforcerEnd = (verbose) => __awaiter(void 0, void 0, void 0, function* () {
     if (!fs.existsSync('./pipeline-enforcer')) {
         throw new Error('pipeline-enforcer was not found');
@@ -82,9 +70,11 @@ function run() {
         }
         catch (error) {
             if (error instanceof CommandError) {
-                // await addSummary(error.message)
                 if (error.exitCode == 13) {
                     core.setFailed('Aqua Security Pipeline Enforcer - assurance policies failed');
+                }
+                else {
+                    core.setFailed(error.message);
                 }
                 process.exitCode = error.exitCode;
             }

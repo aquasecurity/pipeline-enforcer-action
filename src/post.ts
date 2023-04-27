@@ -11,20 +11,6 @@ class CommandError extends Error {
   }
 }
 
-const addSummary = async (summary: string) => {
-  const lines = summary.split('\n')
-  core.summary.addHeading('Aqua Security Pipeline Enforcer').addSeparator()
-  for (const line of lines) {
-    if (line.startsWith('20')) {
-      continue
-    }
-    core.summary.addRaw(line, true).addEOL()
-  }
-  core.summary.addSeparator()
-
-  await core.summary.write()
-}
-
 const executePipelineEnforcerEnd = async (verbose: boolean) => {
   if (!fs.existsSync('./pipeline-enforcer')) {
     throw new Error('pipeline-enforcer was not found')
@@ -51,11 +37,12 @@ async function run(): Promise<void> {
     core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
     if (error instanceof CommandError) {
-      // await addSummary(error.message)
       if (error.exitCode == 13) {
         core.setFailed(
           'Aqua Security Pipeline Enforcer - assurance policies failed'
         )
+      } else {
+        core.setFailed(error.message)
       }
       process.exitCode = error.exitCode
     } else if (error instanceof Error) {
