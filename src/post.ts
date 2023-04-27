@@ -20,7 +20,10 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
     verbose ? '-v' : ''
   }`
 
-  const result = await getExecOutput(pipelineEnforcerCommand)
+  const result = await getExecOutput(pipelineEnforcerCommand, [], {
+    ignoreReturnCode: true
+  })
+
   if (result.exitCode != 0) {
     throw new CommandError(result.exitCode, result.stdout + result.stderr)
   }
@@ -35,6 +38,11 @@ async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof CommandError) {
       core.setFailed(error.message)
+      if (error.exitCode == 13) {
+        core.setFailed(
+          'Aqua Security Pipeline Enforcer - assurance policies failed'
+        )
+      }
       process.exitCode = error.exitCode
     } else if (error instanceof Error) {
       core.setFailed(error.message)
