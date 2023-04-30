@@ -76,7 +76,9 @@ const generateCommand = (flags: PipelineEnforcerStartFlags): string => {
     'ci',
     'start',
     '-r',
-    `"${flags.repoPath}"`
+    `"${flags.repoPath}"`,
+    '--github-matrix',
+    `"${flags.matrix}""`
   ]
 
   if (flags.verbose && !flags.quiet) {

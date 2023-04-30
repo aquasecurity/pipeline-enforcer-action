@@ -14,7 +14,8 @@ export const extractStartInputs = (): PipelineEnforcerStartFlags => {
     repoPath: repoPath || '.',
     accessToken: core.getInput('access-token'),
     aquaKey: core.getInput('aqua-key'),
-    aquaSecret: core.getInput('aqua-secret')
+    aquaSecret: core.getInput('aqua-secret'),
+    matrix: core.getInput('matrix'),
   }
 }
 

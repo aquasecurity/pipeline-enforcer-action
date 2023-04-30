@@ -214,7 +214,8 @@ const extractStartInputs = () => {
         repoPath: repoPath || '.',
         accessToken: core.getInput('access-token'),
         aquaKey: core.getInput('aqua-key'),
-        aquaSecret: core.getInput('aqua-secret')
+        aquaSecret: core.getInput('aqua-secret'),
+        matrix: core.getInput('matrix'),
     };
 };
 exports.extractStartInputs = extractStartInputs;
@@ -1712,10 +1713,6 @@ class ToolRunner extends events.EventEmitter {
             options.windowsVerbatimArguments || this._isCmdFile();
         if (options.windowsVerbatimArguments) {
             result.argv0 = `"${toolPath}"`;
-        }
-        result.detached = options.detached;
-        if (options.detached) {
-            result.stdio = 'ignore';
         }
         return result;
     }
