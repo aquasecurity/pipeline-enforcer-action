@@ -6,6 +6,7 @@ import {PipelineEnforcerStartFlags} from './types'
 
 export const extractStartInputs = (): PipelineEnforcerStartFlags => {
   const repoPath = core.getInput('repo-path')
+  const matrix = core.getInput('matrix')
 
   return {
     verbose: core.getInput('verbose') === 'true',
@@ -15,7 +16,7 @@ export const extractStartInputs = (): PipelineEnforcerStartFlags => {
     accessToken: core.getInput('access-token'),
     aquaKey: core.getInput('aqua-key'),
     aquaSecret: core.getInput('aqua-secret'),
-    matrix: core.getInput('matrix'),
+    matrix: matrix == 'null' ? '' : matrix
   }
 }
 
@@ -32,4 +33,17 @@ export const isLogFilePathValid = (logFilePath: string): boolean => {
   }
 
   return true
+}
+
+export const isMatrixValid = (matrix: string): boolean => {
+  if (matrix == '') {
+    return true
+  }
+
+  try {
+    JSON.parse(matrix)
+    return true
+  } catch (e) {
+    return false
+  }
 }

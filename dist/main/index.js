@@ -101,7 +101,9 @@ const generateCommand = (flags) => {
         'ci',
         'start',
         '-r',
-        `"${flags.repoPath}"`
+        `"${flags.repoPath}"`,
+        '--github-matrix',
+        `"${flags.matrix}"`
     ];
     if (flags.verbose && !flags.quiet) {
         pipelineEnforcerCommand.push('-v');
@@ -121,7 +123,10 @@ const generateCommand = (flags) => {
     return pipelineEnforcerCommand.join(' ');
 };
 const executePipelineEnforcerInBackground = (pipelineEnforcerFlags) => __awaiter(void 0, void 0, void 0, function* () {
-    const { aquaKey, aquaSecret, accessToken } = pipelineEnforcerFlags;
+    const { aquaKey, aquaSecret, accessToken, matrix } = pipelineEnforcerFlags;
+    if (!(0, inputs_1.isMatrixValid)(matrix)) {
+        throw new Error(`Matrix ${matrix} is not a valid JSON`);
+    }
     const command = 'bash';
     const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags);
     yield (0, exec_1.exec)(command, ['-c', pipelineEnforcerCommand], {
@@ -201,12 +206,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isLogFilePathValid = exports.extractStartInputs = void 0;
+exports.isMatrixValid = exports.isLogFilePathValid = exports.extractStartInputs = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
 const extractStartInputs = () => {
     const repoPath = core.getInput('repo-path');
+    const matrix = core.getInput('matrix');
     return {
         verbose: core.getInput('verbose') === 'true',
         quiet: core.getInput('quiet') === 'true',
@@ -215,7 +221,7 @@ const extractStartInputs = () => {
         accessToken: core.getInput('access-token'),
         aquaKey: core.getInput('aqua-key'),
         aquaSecret: core.getInput('aqua-secret'),
-        matrix: core.getInput('matrix'),
+        matrix: matrix == 'null' ? '' : matrix
     };
 };
 exports.extractStartInputs = extractStartInputs;
@@ -232,6 +238,19 @@ const isLogFilePathValid = (logFilePath) => {
     return true;
 };
 exports.isLogFilePathValid = isLogFilePathValid;
+const isMatrixValid = (matrix) => {
+    if (matrix == '') {
+        return true;
+    }
+    try {
+        JSON.parse(matrix);
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+};
+exports.isMatrixValid = isMatrixValid;
 
 
 /***/ }),
@@ -1713,6 +1732,10 @@ class ToolRunner extends events.EventEmitter {
             options.windowsVerbatimArguments || this._isCmdFile();
         if (options.windowsVerbatimArguments) {
             result.argv0 = `"${toolPath}"`;
+        }
+        result.detached = options.detached;
+        if (options.detached) {
+            result.stdio = 'ignore';
         }
         return result;
     }
