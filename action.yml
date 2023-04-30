@@ -25,6 +25,10 @@ inputs:
   log-file:
     description: 'Path to the log file'
     required: false
+  matrix-context:
+    description: 'Matrix context'
+    required: false
+    default: '${{ toJSON(matrix) }}'
 runs:
   using: 'node16'
   main: 'dist/main/index.js'
