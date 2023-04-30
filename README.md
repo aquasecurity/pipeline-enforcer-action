@@ -19,6 +19,7 @@ Open source version of this action is available [here](https://github.com/aquase
     - [If the repository is cloned in a different folder](#if-the-repository-is-cloned-in-a-different-folder)
     - [If the workflow is executed by a reusable workflow with matrix strategy](#if-the-workflow-is-executed-by-a-reusable-workflow-with-matrix-strategy)
       - [Imported Workflow](#imported-workflow)
+      - [Importing Workflow](#importing-workflow)
   - [Inputs](#inputs)
 
 ---
@@ -125,6 +126,8 @@ on:
             access-token: ${{ secrets.GITHUB_TOKEN }}
             matrix: ${{ inputs.matrix || toJSON(matrix) }}
 ```
+
+#### Importing Workflow
 
 ```yaml
 name: Build
