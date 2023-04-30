@@ -26,7 +26,11 @@ inputs:
     description: 'Path to the log file'
     required: false
   matrix-context:
-    description: 'Matrix context'
+    description: |
+      GitHub matrix strategy effects the name of the job
+      The matrix context is required if the action is executed 
+      by a reusable workflow using workflow_call trigger combined
+      with matrix strategy.
     required: false
     default: '${{ toJSON(matrix) }}'
 runs:

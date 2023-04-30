@@ -8,12 +8,18 @@ Open source version of this action is available [here](https://github.com/aquase
 
 ## Table of Contents
 
-- [Threats Protection](#threats-protection)
-- [Protection Methods](#protection-methods)
-  - [Activity Profiling](#activity-profiling)
-  - [Suspicious Behavior Detection](#suspicious-behavior-detection)
-- [Usage](#usage)
-- [Inputs](#inputs)
+- [Pipeline Enforcer Action](#pipeline-enforcer-action)
+  - [Table of Contents](#table-of-contents)
+  - [Threats Protection](#threats-protection)
+  - [Protection Methods](#protection-methods)
+    - [Activity Profiling](#activity-profiling)
+    - [Suspicious Behavior Detection](#suspicious-behavior-detection)
+  - [Usage](#usage)
+    - [Profile your workflow job](#profile-your-workflow-job)
+    - [If the repository is cloned in a different folder](#if-the-repository-is-cloned-in-a-different-folder)
+    - [If the workflow is executed by a reusable workflow with matrix strategy](#if-the-workflow-is-executed-by-a-reusable-workflow-with-matrix-strategy)
+      - [Imported Workflow](#imported-workflow)
+  - [Inputs](#inputs)
 
 ---
 
@@ -93,19 +99,62 @@ jobs:
     - ...
 ```
 
+### If the workflow is executed by a reusable workflow with matrix strategy
+
+#### Imported Workflow
+
+```yaml
+name: Imported
+on:
+  workflow_call:
+    inputs:
+      matrix:
+        type: string
+        required: false
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Pipeline Enforcer
+          uses: aquasecurity/pipeline-enforcer-action@v1.0.0
+          with:
+            aqua-key: ${{ secrets.AQUA_KEY }}
+            aqua-secret: ${{ secrets.AQUA_SECRET }}
+            access-token: ${{ secrets.GITHUB_TOKEN }}
+            matrix: ${{ inputs.matrix || toJSON(matrix) }}
+```
+
+```yaml
+name: Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        type: [1, 2]
+    uses: ./.github/workflows/imported.yml@main
+    with:
+      matrix: ${{ toJSON(matrix) }}
+```
+
 ---
 
 ## Inputs
 
-| Name           | type     | description                                                                                                                                                                                         | required | default             |
-| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------- |
-| `aqua-key`     | `string` | Aqua key                                                                                                                                                                                            | `true`   |                     |
-| `aqua-secret`  | `string` | Aqua secret                                                                                                                                                                                         | `true`   |                     |
-| `access-token` | `string` | GitHub access token, defaults to the CI token, if CI permissions are specified, use the `action: read` permission. If a custom access token is used, make sure to have the `repo: read` permissions | `true`   | `${{github.token}}` |
-| `repo-path`    | `string` | Repository path                                                                                                                                                                                     | `false`  | `.`                 |
-| `quiet`        | `bool`   | Quiet mode - Print only errors                                                                                                                                                                      | `false`  | `false`             |
-| `verbose`      | `bool`   | Verbose mode - Print debug logs and above. In case both `quiet` and `verbose` are `true`, `quiet` will be applied                                                                                   | `false`  | `false`             |
-| `log-file`     | `string` | Log file path                                                                                                                                                                                       | `false`  |                     |
+| Name           | type     | description                                                                                                                                                                                         | required | default               |
+| -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------- |
+| `aqua-key`     | `string` | Aqua key                                                                                                                                                                                            | `true`   |                       |
+| `aqua-secret`  | `string` | Aqua secret                                                                                                                                                                                         | `true`   |                       |
+| `access-token` | `string` | GitHub access token, defaults to the CI token, if CI permissions are specified, use the `action: read` permission. If a custom access token is used, make sure to have the `repo: read` permissions | `true`   | `${{github.token}}`   |
+| `repo-path`    | `string` | Repository path                                                                                                                                                                                     | `false`  | `.`                   |
+| `quiet`        | `bool`   | Quiet mode - Print only errors                                                                                                                                                                      | `false`  | `false`               |
+| `verbose`      | `bool`   | Verbose mode - Print debug logs and above. In case both `quiet` and `verbose` are `true`, `quiet` will be applied                                                                                   | `false`  | `false`               |
+| `log-file`     | `string` | Log file path                                                                                                                                                                                       | `false`  |                       |
+| `matrix`       | `string` | GitHub matrix strategy effects the name of the job. The matrix context is required if the action is executed by a reusable workflow using workflow_call trigger combined with matrix strategy.      | `false`  | `${{toJSON(matrix)}}` |
 
 ---
 
