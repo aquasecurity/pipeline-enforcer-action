@@ -103,7 +103,7 @@ const generateCommand = (flags) => {
         '-r',
         `"${flags.repoPath}"`,
         '--github-matrix',
-        `"${flags.matrix}"`
+        `'${flags.matrix}'`
     ];
     if (flags.verbose && !flags.quiet) {
         pipelineEnforcerCommand.push('-v');
