@@ -9,6 +9,7 @@ export type PipelineEnforcerStartFlags = PipelineEnforcerFlags & {
   aquaKey: string
   aquaSecret: string
   accessToken: string
+  matrix: string
 }
 
 export type PipelineEnforcerEndFlags = PipelineEnforcerFlags &
