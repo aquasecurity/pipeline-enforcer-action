@@ -157,7 +157,7 @@ jobs:
 | `quiet`        | `bool`   | Quiet mode - Print only errors                                                                                                                                                                      | `false`  | `false`               |
 | `verbose`      | `bool`   | Verbose mode - Print debug logs and above. In case both `quiet` and `verbose` are `true`, `quiet` will be applied                                                                                   | `false`  | `false`               |
 | `log-file`     | `string` | Log file path                                                                                                                                                                                       | `false`  |                       |
-| `matrix`       | `string` | GitHub matrix strategy effects the name of the job. The matrix context is required if the action is executed by a reusable workflow using workflow_call trigger combined with matrix strategy.      | `false`  | `${{toJSON(matrix)}}` |
+| `matrix`       | `string` | GitHub matrix strategy affects the name of the job. The matrix context is required if the action is executed by a reusable workflow using workflow_call trigger combined with matrix strategy.      | `false`  | `${{toJSON(matrix)}}` |
 
 ---
 
