@@ -25,7 +25,7 @@ inputs:
   log-file:
     description: 'Path to the log file'
     required: false
-  matrix-context:
+  matrix:
     description: |
       GitHub matrix strategy affects the name of the job
       The matrix context is required if the action is executed 
