@@ -70,9 +70,11 @@ function run() {
         }
         catch (error) {
             if (error instanceof CommandError) {
-                core.setFailed(error.message);
                 if (error.exitCode == 13) {
                     core.setFailed('Aqua Security Pipeline Enforcer - assurance policies failed');
+                }
+                else {
+                    core.setFailed(error.message);
                 }
                 process.exitCode = error.exitCode;
             }
