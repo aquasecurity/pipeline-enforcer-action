@@ -124,9 +124,6 @@ const generateCommand = (flags) => {
 };
 const executePipelineEnforcerInBackground = (pipelineEnforcerFlags) => __awaiter(void 0, void 0, void 0, function* () {
     const { aquaKey, aquaSecret, accessToken, matrix } = pipelineEnforcerFlags;
-    if (!(0, inputs_1.isMatrixValid)(matrix)) {
-        throw new Error(`Matrix ${matrix} is not a valid JSON`);
-    }
     const command = 'bash';
     const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags);
     yield (0, exec_1.exec)(command, ['-c', pipelineEnforcerCommand], {
@@ -154,10 +151,13 @@ const waitForPipelineEnforcerToInitialize = (timeout, initFilePath) => {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const pipelineEnforcerFlags = (0, inputs_1.extractStartInputs)();
+            core.debug('validating inputs');
+            (0, inputs_1.validateInputs)(pipelineEnforcerFlags);
+            core.debug('inputs validated successfully');
             core.debug('Downloading pipeline-enforcer binary');
             yield downloadPipelineEnforcerCommercial();
             core.info('pipeline-enforcer binary downloaded successfully');
-            const pipelineEnforcerFlags = (0, inputs_1.extractStartInputs)();
             core.debug('Starting pipeline-enforcer in the background');
             yield executePipelineEnforcerInBackground(pipelineEnforcerFlags);
             core.info('pipeline-enforcer started successfully');
@@ -206,7 +206,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isMatrixValid = exports.isLogFilePathValid = exports.extractStartInputs = void 0;
+exports.isMatrixValid = exports.isLogFilePathValid = exports.validateInputs = exports.extractStartInputs = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
@@ -225,6 +225,21 @@ const extractStartInputs = () => {
     };
 };
 exports.extractStartInputs = extractStartInputs;
+const validateInputs = (flags) => {
+    if (!flags.aquaKey) {
+        throw new Error('Required input aqua-key is empty');
+    }
+    if (!flags.aquaSecret) {
+        throw new Error('Required input aqua-secret is empty');
+    }
+    if (!flags.accessToken) {
+        throw new Error('Required input access-token is empty');
+    }
+    if (!(0, exports.isMatrixValid)(flags.matrix)) {
+        throw new Error(`Matrix ${flags.matrix} is not a valid JSON`);
+    }
+};
+exports.validateInputs = validateInputs;
 const isLogFilePathValid = (logFilePath) => {
     // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);

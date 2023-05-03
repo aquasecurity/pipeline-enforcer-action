@@ -20,6 +20,24 @@ export const extractStartInputs = (): PipelineEnforcerStartFlags => {
   }
 }
 
+export const validateInputs = (flags: PipelineEnforcerStartFlags) => {
+  if (!flags.aquaKey) {
+    throw new Error('Required input aqua-key is empty')
+  }
+
+  if (!flags.aquaSecret) {
+    throw new Error('Required input aqua-secret is empty')
+  }
+
+  if (!flags.accessToken) {
+    throw new Error('Required input access-token is empty')
+  }
+
+  if (!isMatrixValid(flags.matrix)) {
+    throw new Error(`Matrix ${flags.matrix} is not a valid JSON`)
+  }
+}
+
 export const isLogFilePathValid = (logFilePath: string): boolean => {
   // Check that the directory exists
   const logFileDir = path.dirname(logFilePath)
