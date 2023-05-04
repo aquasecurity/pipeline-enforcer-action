@@ -4,7 +4,7 @@ import * as core from '@actions/core'
 import {exec} from '@actions/exec'
 import * as http from '@actions/http-client'
 import * as fs from 'fs'
-import {extractStartInputs, isLogFilePathValid, isMatrixValid} from './inputs'
+import {extractStartInputs, isLogFilePathValid, validateInputs} from './inputs'
 import {PipelineEnforcerStartFlags} from './types'
 
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start'
@@ -108,10 +108,6 @@ const executePipelineEnforcerInBackground = async (
   pipelineEnforcerFlags: PipelineEnforcerStartFlags
 ) => {
   const {aquaKey, aquaSecret, accessToken, matrix} = pipelineEnforcerFlags
-  if (!isMatrixValid(matrix)) {
-    throw new Error(`Matrix ${matrix} is not a valid JSON`)
-  }
-
   const command = 'bash'
   const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags)
   await exec(command, ['-c', pipelineEnforcerCommand], {
@@ -149,10 +145,13 @@ const waitForPipelineEnforcerToInitialize = (
 
 async function run(): Promise<void> {
   try {
+    const pipelineEnforcerFlags = extractStartInputs()
+    core.debug('validating inputs')
+    validateInputs(pipelineEnforcerFlags)
+    core.debug('inputs validated successfully')
     core.debug('Downloading pipeline-enforcer binary')
     await downloadPipelineEnforcerCommercial()
     core.info('pipeline-enforcer binary downloaded successfully')
-    const pipelineEnforcerFlags = extractStartInputs()
     core.debug('Starting pipeline-enforcer in the background')
     await executePipelineEnforcerInBackground(pipelineEnforcerFlags)
     core.info('pipeline-enforcer started successfully')
