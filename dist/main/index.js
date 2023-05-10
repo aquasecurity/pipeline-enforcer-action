@@ -123,7 +123,7 @@ const generateCommand = (flags) => {
     return pipelineEnforcerCommand.join(' ');
 };
 const executePipelineEnforcerInBackground = (pipelineEnforcerFlags) => __awaiter(void 0, void 0, void 0, function* () {
-    const { aquaKey, aquaSecret, accessToken, matrix } = pipelineEnforcerFlags;
+    const { aquaKey, aquaSecret, accessToken } = pipelineEnforcerFlags;
     const command = 'bash';
     const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags);
     yield (0, exec_1.exec)(command, ['-c', pipelineEnforcerCommand], {
@@ -206,7 +206,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isMatrixValid = exports.isLogFilePathValid = exports.validateInputs = exports.extractStartInputs = void 0;
+exports.isMatrixValid = exports.isLogFilePathValid = exports.validateEndInputs = exports.extractEndInputs = exports.validateInputs = exports.extractStartInputs = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
@@ -240,6 +240,28 @@ const validateInputs = (flags) => {
     }
 };
 exports.validateInputs = validateInputs;
+const extractEndInputs = () => {
+    return {
+        verbose: core.getInput('verbose') === 'true',
+        quiet: core.getInput('quiet') === 'true',
+        logFile: core.getInput('log-file'),
+        aquaKey: core.getInput('aqua-key'),
+        aquaSecret: core.getInput('aqua-secret')
+    };
+};
+exports.extractEndInputs = extractEndInputs;
+const validateEndInputs = (flags) => {
+    if (!flags.aquaKey) {
+        throw new Error('Required input aqua-key is empty');
+    }
+    if (!flags.aquaSecret) {
+        throw new Error('Required input aqua-secret is empty');
+    }
+    if (flags.logFile && !(0, exports.isLogFilePathValid)(flags.logFile)) {
+        throw new Error(`Log file path ${flags.logFile} is invalid`);
+    }
+};
+exports.validateEndInputs = validateEndInputs;
 const isLogFilePathValid = (logFilePath) => {
     // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);

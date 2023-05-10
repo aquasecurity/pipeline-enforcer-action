@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
+import {PipelineEnforcerEndFlags} from './types'
+import {extractEndInputs} from './inputs'
 
 class CommandError extends Error {
   exitCode: number
@@ -11,17 +13,22 @@ class CommandError extends Error {
   }
 }
 
-const executePipelineEnforcerEnd = async (verbose: boolean) => {
+const executePipelineEnforcerEnd = async (flags: PipelineEnforcerEndFlags) => {
   if (!fs.existsSync('./pipeline-enforcer')) {
     throw new Error('pipeline-enforcer was not found')
   }
 
   const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${
-    verbose ? '-v' : ''
+    flags.verbose ? '-v' : ''
   }`
 
   const result = await getExecOutput(pipelineEnforcerCommand, [], {
-    ignoreReturnCode: true
+    ignoreReturnCode: true,
+    env: {
+      ...process.env,
+      AQUA_KEY: flags.aquaKey,
+      AQUA_SECRET: flags.aquaSecret
+    }
   })
 
   if (result.exitCode != 0) {
@@ -31,9 +38,9 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
 
 async function run(): Promise<void> {
   try {
-    const verbose = core.getInput('verbose') === 'true'
+    const flags = extractEndInputs()
     core.info('Ending pipeline-enforcer run')
-    await executePipelineEnforcerEnd(verbose)
+    await executePipelineEnforcerEnd(flags)
     core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
     if (error instanceof CommandError) {

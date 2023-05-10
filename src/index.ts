@@ -107,7 +107,7 @@ const generateCommand = (flags: PipelineEnforcerStartFlags): string => {
 const executePipelineEnforcerInBackground = async (
   pipelineEnforcerFlags: PipelineEnforcerStartFlags
 ) => {
-  const {aquaKey, aquaSecret, accessToken, matrix} = pipelineEnforcerFlags
+  const {aquaKey, aquaSecret, accessToken} = pipelineEnforcerFlags
   const command = 'bash'
   const pipelineEnforcerCommand = generateCommand(pipelineEnforcerFlags)
   await exec(command, ['-c', pipelineEnforcerCommand], {
