@@ -81,22 +81,12 @@ const validateEndInputs = (flags) => {
     if (!flags.aquaSecret) {
         throw new Error('Required input aqua-secret is empty');
     }
-    if (flags.logFile && !(0, exports.isLogFilePathValid)(flags.logFile)) {
-        throw new Error(`Log file path ${flags.logFile} is invalid`);
-    }
 };
 exports.validateEndInputs = validateEndInputs;
 const isLogFilePathValid = (logFilePath) => {
     // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);
-    if (!fs.existsSync(logFileDir)) {
-        return false;
-    }
-    // Check that the file does not exit
-    if (fs.existsSync(logFilePath)) {
-        return false;
-    }
-    return true;
+    return fs.existsSync(logFileDir);
 };
 exports.isLogFilePathValid = isLogFilePathValid;
 const isMatrixValid = (matrix) => {
@@ -179,8 +169,9 @@ const executePipelineEnforcerEnd = (flags) => __awaiter(void 0, void 0, void 0, 
 });
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const flags = (0, inputs_1.extractEndInputs)();
         try {
-            const flags = (0, inputs_1.extractEndInputs)();
+            (0, inputs_1.validateEndInputs)(flags);
             core.info('Ending pipeline-enforcer run');
             yield executePipelineEnforcerEnd(flags);
             core.debug('pipeline-enforcer ended successfully');
@@ -200,7 +191,7 @@ function run() {
             }
         }
         finally {
-            const logFile = core.getInput('log-file');
+            const { logFile } = flags;
             if (logFile && fs.existsSync(logFile)) {
                 const log = fs.readFileSync(logFile, 'utf8');
                 core.info(`pipeline-enforcer logs`);

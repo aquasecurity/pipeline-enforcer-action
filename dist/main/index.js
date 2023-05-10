@@ -257,22 +257,12 @@ const validateEndInputs = (flags) => {
     if (!flags.aquaSecret) {
         throw new Error('Required input aqua-secret is empty');
     }
-    if (flags.logFile && !(0, exports.isLogFilePathValid)(flags.logFile)) {
-        throw new Error(`Log file path ${flags.logFile} is invalid`);
-    }
 };
 exports.validateEndInputs = validateEndInputs;
 const isLogFilePathValid = (logFilePath) => {
     // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);
-    if (!fs.existsSync(logFileDir)) {
-        return false;
-    }
-    // Check that the file does not exit
-    if (fs.existsSync(logFilePath)) {
-        return false;
-    }
-    return true;
+    return fs.existsSync(logFileDir);
 };
 exports.isLogFilePathValid = isLogFilePathValid;
 const isMatrixValid = (matrix) => {

@@ -37,8 +37,8 @@ const executePipelineEnforcerEnd = async (flags: PipelineEnforcerEndFlags) => {
 }
 
 async function run(): Promise<void> {
+  const flags = extractEndInputs()
   try {
-    const flags = extractEndInputs()
     validateEndInputs(flags)
 
     core.info('Ending pipeline-enforcer run')
@@ -58,7 +58,7 @@ async function run(): Promise<void> {
       core.setFailed(error.message)
     }
   } finally {
-    const logFile = core.getInput('log-file')
+    const {logFile} = flags
     if (logFile && fs.existsSync(logFile)) {
       const log = fs.readFileSync(logFile, 'utf8')
       core.info(`pipeline-enforcer logs`)
