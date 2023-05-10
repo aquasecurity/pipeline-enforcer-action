@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
 import {PipelineEnforcerEndFlags} from './types'
-import {extractEndInputs} from './inputs'
+import {extractEndInputs, validateEndInputs} from './inputs'
 
 class CommandError extends Error {
   exitCode: number
@@ -39,6 +39,8 @@ const executePipelineEnforcerEnd = async (flags: PipelineEnforcerEndFlags) => {
 async function run(): Promise<void> {
   try {
     const flags = extractEndInputs()
+    validateEndInputs(flags)
+
     core.info('Ending pipeline-enforcer run')
     await executePipelineEnforcerEnd(flags)
     core.debug('pipeline-enforcer ended successfully')
