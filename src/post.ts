@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import {getExecOutput} from '@actions/exec'
 import * as fs from 'fs'
+import {PipelineEnforcerEndFlags} from './types'
+import {extractEndInputs, validateEndInputs} from './inputs'
 
 class CommandError extends Error {
   exitCode: number
@@ -11,7 +13,8 @@ class CommandError extends Error {
   }
 }
 
-const executePipelineEnforcerEnd = async (verbose: boolean) => {
+const executePipelineEnforcerEnd = async (flags: PipelineEnforcerEndFlags) => {
+  const {aquaKey, aquaSecret, verbose} = flags
   if (!fs.existsSync('./pipeline-enforcer')) {
     throw new Error('pipeline-enforcer was not found')
   }
@@ -21,7 +24,12 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
   }`
 
   const result = await getExecOutput(pipelineEnforcerCommand, [], {
-    ignoreReturnCode: true
+    ignoreReturnCode: true,
+    env: {
+      ...process.env,
+      AQUA_KEY: aquaKey,
+      AQUA_SECRET: aquaSecret
+    }
   })
 
   if (result.exitCode != 0) {
@@ -30,10 +38,12 @@ const executePipelineEnforcerEnd = async (verbose: boolean) => {
 }
 
 async function run(): Promise<void> {
+  const flags = extractEndInputs()
   try {
-    const verbose = core.getInput('verbose') === 'true'
+    validateEndInputs(flags)
+
     core.info('Ending pipeline-enforcer run')
-    await executePipelineEnforcerEnd(verbose)
+    await executePipelineEnforcerEnd(flags)
     core.debug('pipeline-enforcer ended successfully')
   } catch (error) {
     if (error instanceof CommandError) {
@@ -49,7 +59,7 @@ async function run(): Promise<void> {
       core.setFailed(error.message)
     }
   } finally {
-    const logFile = core.getInput('log-file')
+    const {logFile} = flags
     if (logFile && fs.existsSync(logFile)) {
       const log = fs.readFileSync(logFile, 'utf8')
       core.info(`pipeline-enforcer logs`)

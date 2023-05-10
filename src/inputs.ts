@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as path from 'path'
 
-import {PipelineEnforcerStartFlags} from './types'
+import {PipelineEnforcerEndFlags, PipelineEnforcerStartFlags} from './types'
 
 export const extractStartInputs = (): PipelineEnforcerStartFlags => {
   const repoPath = core.getInput('repo-path')
@@ -38,19 +38,29 @@ export const validateInputs = (flags: PipelineEnforcerStartFlags) => {
   }
 }
 
+export const extractEndInputs = (): PipelineEnforcerEndFlags => {
+  return {
+    verbose: core.getInput('verbose') === 'true',
+    quiet: core.getInput('quiet') === 'true',
+    logFile: core.getInput('log-file'),
+    aquaKey: core.getInput('aqua-key'),
+    aquaSecret: core.getInput('aqua-secret')
+  }
+}
+
+export const validateEndInputs = (flags: PipelineEnforcerEndFlags) => {
+  if (!flags.aquaKey) {
+    throw new Error('Required input aqua-key is empty')
+  }
+
+  if (!flags.aquaSecret) {
+    throw new Error('Required input aqua-secret is empty')
+  }
+}
+
 export const isLogFilePathValid = (logFilePath: string): boolean => {
-  // Check that the directory exists
   const logFileDir = path.dirname(logFilePath)
-  if (!fs.existsSync(logFileDir)) {
-    return false
-  }
-
-  // Check that the file does not exit
-  if (fs.existsSync(logFilePath)) {
-    return false
-  }
-
-  return true
+  return fs.existsSync(logFileDir)
 }
 
 export const isMatrixValid = (matrix: string): boolean => {
