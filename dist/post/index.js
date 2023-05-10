@@ -84,7 +84,6 @@ const validateEndInputs = (flags) => {
 };
 exports.validateEndInputs = validateEndInputs;
 const isLogFilePathValid = (logFilePath) => {
-    // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);
     return fs.existsSync(logFileDir);
 };
@@ -155,13 +154,14 @@ class CommandError extends Error {
     }
 }
 const executePipelineEnforcerEnd = (flags) => __awaiter(void 0, void 0, void 0, function* () {
+    const { aquaKey, aquaSecret, verbose } = flags;
     if (!fs.existsSync('./pipeline-enforcer')) {
         throw new Error('pipeline-enforcer was not found');
     }
-    const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${flags.verbose ? '-v' : ''}`;
+    const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${verbose ? '-v' : ''}`;
     const result = yield (0, exec_1.getExecOutput)(pipelineEnforcerCommand, [], {
         ignoreReturnCode: true,
-        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: flags.aquaKey, AQUA_SECRET: flags.aquaSecret })
+        env: Object.assign(Object.assign({}, process.env), { AQUA_KEY: aquaKey, AQUA_SECRET: aquaSecret })
     });
     if (result.exitCode != 0) {
         throw new CommandError(result.exitCode, result.stdout + result.stderr);

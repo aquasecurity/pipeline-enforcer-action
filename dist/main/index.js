@@ -260,7 +260,6 @@ const validateEndInputs = (flags) => {
 };
 exports.validateEndInputs = validateEndInputs;
 const isLogFilePathValid = (logFilePath) => {
-    // Check that the directory exists
     const logFileDir = path.dirname(logFilePath);
     return fs.existsSync(logFileDir);
 };

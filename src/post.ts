@@ -14,20 +14,21 @@ class CommandError extends Error {
 }
 
 const executePipelineEnforcerEnd = async (flags: PipelineEnforcerEndFlags) => {
+  const {aquaKey, aquaSecret, verbose} = flags
   if (!fs.existsSync('./pipeline-enforcer')) {
     throw new Error('pipeline-enforcer was not found')
   }
 
   const pipelineEnforcerCommand = `./pipeline-enforcer ci end ${
-    flags.verbose ? '-v' : ''
+    verbose ? '-v' : ''
   }`
 
   const result = await getExecOutput(pipelineEnforcerCommand, [], {
     ignoreReturnCode: true,
     env: {
       ...process.env,
-      AQUA_KEY: flags.aquaKey,
-      AQUA_SECRET: flags.aquaSecret
+      AQUA_KEY: aquaKey,
+      AQUA_SECRET: aquaSecret
     }
   })
 
