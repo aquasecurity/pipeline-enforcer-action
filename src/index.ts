@@ -12,7 +12,7 @@ const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh'
 const INTEGRITY_CLI_DEV_DOWNLOAD_URL =
-  'download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh'
+  'https://download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh'
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL =
   'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum'
 

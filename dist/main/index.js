@@ -51,7 +51,7 @@ const inputs_1 = __nccwpck_require__(180);
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh';
-const INTEGRITY_CLI_DEV_DOWNLOAD_URL = 'download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh';
+const INTEGRITY_CLI_DEV_DOWNLOAD_URL = 'https://download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const httpClient = new http.HttpClient('pipeline-enforcer-action');
 const downloadToFile = (url, filePath) => __awaiter(void 0, void 0, void 0, function* () {
