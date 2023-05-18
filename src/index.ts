@@ -133,7 +133,8 @@ const executePipelineEnforcerInBackground = async (
 
 const waitForPipelineEnforcerToInitialize = (
   timeout: number,
-  initFilePath: string
+  initFilePath: string,
+  errorFilePath: string
 ) => {
   return new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
@@ -142,29 +143,16 @@ const waitForPipelineEnforcerToInitialize = (
         clearInterval(interval)
         resolve()
       }
-    }, 1000)
-
-    setTimeout(() => {
-      clearInterval(interval)
-      reject(new Error('Timeout waiting for pipeline-enforcer to initialize'))
-    }, timeout)
-  })
-}
-
-const checkPipelineEnforcerError = (timeout: number, errorFilePath: string) => {
-  return new Promise<void>((resolve, reject) => {
-    const interval = setInterval(() => {
       if (fs.existsSync(errorFilePath)) {
         core.debug(`Found pipeline-enforcer error file: ${errorFilePath}`)
         clearInterval(interval)
-        core.info('pipeline-enforcer failed to start')
         reject(new Error('pipeline enforce error'))
       }
     }, 1000)
 
     setTimeout(() => {
       clearInterval(interval)
-      resolve()
+      reject(new Error('Timeout waiting for pipeline-enforcer to initialize'))
     }, timeout)
   })
 }
@@ -185,11 +173,10 @@ async function run(): Promise<void> {
     core.debug('Waiting for pipeline-enforcer to initialize.')
     await waitForPipelineEnforcerToInitialize(
       30000,
-      PIPELINE_ENFORCER_INIT_FILE
+      PIPELINE_ENFORCER_INIT_FILE,
+      'tmp/pipeline-enforcer.errorr'
     )
     core.info('pipeline-enforcer initialized successfully')
-    await checkPipelineEnforcerError(30000, 'tmp/pipeline-enforcer.error')
-    core.info('pipeline-enforcer ended successfully')
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
