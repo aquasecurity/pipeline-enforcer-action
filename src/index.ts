@@ -11,6 +11,8 @@ const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start'
 const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh'
+const INTEGRITY_CLI_DEV_DOWNLOAD_URL =
+  'download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh'
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL =
   'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum'
 
@@ -38,18 +40,23 @@ const getFileSHA256 = (filePath: string) => {
   return hash
 }
 
-const executeInstallationScript = async () => {
+const executeInstallationScript = async (devDownloadToken: string) => {
   const command = `sh`
-  await exec(command, [INSTALLATION_SCRIPT_PATH], {
+  await exec(command, [INSTALLATION_SCRIPT_PATH, devDownloadToken], {
     env: {
       ...process.env,
-      BINDIR: '.'
+      BINDIR: '.',
+      DEBUG: 'true'
     }
   })
 }
 
-const downloadPipelineEnforcerCommercial = async () => {
-  await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
+const downloadPipelineEnforcerCommercial = async (
+  pipelineEnforcerFlags: PipelineEnforcerStartFlags
+) => {
+  // await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
+  const {devDownloadToken} = pipelineEnforcerFlags
+  await downloadToFile(INTEGRITY_CLI_DEV_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
   const expectedChecksum = await getChecksum()
   const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
   core.debug(`Expected checksum: ${expectedChecksum}`)
@@ -60,7 +67,8 @@ const downloadPipelineEnforcerCommercial = async () => {
     )
   }
 
-  await executeInstallationScript()
+  // await executeInstallationScript()
+  await executeInstallationScript(devDownloadToken ? devDownloadToken : '')
   try {
     fs.rmSync(INSTALLATION_SCRIPT_PATH)
   } catch (error) {
@@ -143,10 +151,7 @@ const waitForPipelineEnforcerToInitialize = (
   })
 }
 
-const checkPipelineEnforcerError = (
-  timeout: number,
-  errorFilePath: string
-) => {
+const checkPipelineEnforcerError = (timeout: number, errorFilePath: string) => {
   return new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
       if (fs.existsSync(errorFilePath)) {
@@ -170,7 +175,7 @@ async function run(): Promise<void> {
     validateInputs(pipelineEnforcerFlags)
     core.debug('inputs validated successfully')
     core.debug('Downloading pipeline-enforcer binary')
-    await downloadPipelineEnforcerCommercial()
+    await downloadPipelineEnforcerCommercial(pipelineEnforcerFlags)
     core.info('pipeline-enforcer binary downloaded successfully')
     core.debug('Starting pipeline-enforcer in the background')
     await executePipelineEnforcerInBackground(pipelineEnforcerFlags)
@@ -182,10 +187,7 @@ async function run(): Promise<void> {
       PIPELINE_ENFORCER_INIT_FILE
     )
     core.info('pipeline-enforcer initialized successfully')
-    await checkPipelineEnforcerError(
-      30000,
-      "tmp/pipeline-enforcer.error"
-    )
+    await checkPipelineEnforcerError(30000, 'tmp/pipeline-enforcer.error')
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)

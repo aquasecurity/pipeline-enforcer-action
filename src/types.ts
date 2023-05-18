@@ -4,6 +4,7 @@ export type PipelineEnforcerFlags = {
   logFile?: string
   aquaKey: string
   aquaSecret: string
+  devDownloadToken?: string
 }
 
 export type PipelineEnforcerStartFlags = PipelineEnforcerFlags & {

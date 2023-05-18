@@ -16,6 +16,7 @@ export const extractStartInputs = (): PipelineEnforcerStartFlags => {
     accessToken: core.getInput('access-token'),
     aquaKey: core.getInput('aqua-key'),
     aquaSecret: core.getInput('aqua-secret'),
+    devDownloadToken: core.getInput('dev-download-token'),
     matrix: matrix == 'null' ? '' : matrix
   }
 }
