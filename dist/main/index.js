@@ -51,6 +51,7 @@ const inputs_1 = __nccwpck_require__(180);
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh';
+const INTEGRITY_CLI_DEV_DOWNLOAD_URL = 'download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const httpClient = new http.HttpClient('pipeline-enforcer-action');
 const downloadToFile = (url, filePath) => __awaiter(void 0, void 0, void 0, function* () {
@@ -70,14 +71,16 @@ const getFileSHA256 = (filePath) => {
     const hash = crypto_1.default.createHash('sha256').update(data).digest('hex');
     return hash;
 };
-const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, function* () {
+const executeInstallationScript = (devDownloadToken) => __awaiter(void 0, void 0, void 0, function* () {
     const command = `sh`;
-    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
-        env: Object.assign(Object.assign({}, process.env), { BINDIR: '.' })
+    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH, devDownloadToken], {
+        env: Object.assign(Object.assign({}, process.env), { BINDIR: '.', DEBUG: 'true' })
     });
 });
-const downloadPipelineEnforcerCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
+const downloadPipelineEnforcerCommercial = (pipelineEnforcerFlags) => __awaiter(void 0, void 0, void 0, function* () {
+    // await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
+    const { devDownloadToken } = pipelineEnforcerFlags;
+    yield downloadToFile(INTEGRITY_CLI_DEV_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
     const expectedChecksum = yield getChecksum();
     const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH);
     core.debug(`Expected checksum: ${expectedChecksum}`);
@@ -85,7 +88,8 @@ const downloadPipelineEnforcerCommercial = () => __awaiter(void 0, void 0, void 
     if (expectedChecksum !== actualChecksum) {
         throw new Error(`Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`);
     }
-    yield executeInstallationScript();
+    // await executeInstallationScript()
+    yield executeInstallationScript(devDownloadToken ? devDownloadToken : '');
     try {
         fs.rmSync(INSTALLATION_SCRIPT_PATH);
     }
@@ -133,13 +137,18 @@ const executePipelineEnforcerInBackground = (pipelineEnforcerFlags) => __awaiter
         detached: true
     });
 });
-const waitForPipelineEnforcerToInitialize = (timeout, initFilePath) => {
+const waitForPipelineEnforcerToInitialize = (timeout, initFilePath, errorFilePath) => {
     return new Promise((resolve, reject) => {
         const interval = setInterval(() => {
             if (fs.existsSync(initFilePath)) {
                 core.debug(`Found pipeline-enforcer init file: ${initFilePath}`);
                 clearInterval(interval);
                 resolve();
+            }
+            if (fs.existsSync(errorFilePath)) {
+                core.debug(`Found pipeline-enforcer error file: ${errorFilePath}`);
+                clearInterval(interval);
+                reject(new Error('pipeline enforce error'));
             }
         }, 1000);
         setTimeout(() => {
@@ -156,13 +165,13 @@ function run() {
             (0, inputs_1.validateInputs)(pipelineEnforcerFlags);
             core.debug('inputs validated successfully');
             core.debug('Downloading pipeline-enforcer binary');
-            yield downloadPipelineEnforcerCommercial();
+            yield downloadPipelineEnforcerCommercial(pipelineEnforcerFlags);
             core.info('pipeline-enforcer binary downloaded successfully');
             core.debug('Starting pipeline-enforcer in the background');
             yield executePipelineEnforcerInBackground(pipelineEnforcerFlags);
             core.info('pipeline-enforcer started successfully');
             core.debug('Waiting for pipeline-enforcer to initialize.');
-            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE);
+            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE, 'tmp/pipeline-enforcer.error');
             core.info('pipeline-enforcer initialized successfully');
         }
         catch (error) {
@@ -221,17 +230,18 @@ const extractStartInputs = () => {
         accessToken: core.getInput('access-token'),
         aquaKey: core.getInput('aqua-key'),
         aquaSecret: core.getInput('aqua-secret'),
+        devDownloadToken: core.getInput('dev-download-token'),
         matrix: matrix == 'null' ? '' : matrix
     };
 };
 exports.extractStartInputs = extractStartInputs;
 const validateInputs = (flags) => {
-    if (!flags.aquaKey) {
-        throw new Error('Required input aqua-key is empty');
-    }
-    if (!flags.aquaSecret) {
-        throw new Error('Required input aqua-secret is empty');
-    }
+    // if (!flags.aquaKey) {
+    //   throw new Error('Required input aqua-key is empty')
+    // }
+    // if (!flags.aquaSecret) {
+    //   throw new Error('Required input aqua-secret is empty')
+    // }
     if (!flags.accessToken) {
         throw new Error('Required input access-token is empty');
     }
@@ -2745,6 +2755,10 @@ function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
     }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
+    }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
         return false;
@@ -2770,13 +2784,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
@@ -2816,11 +2841,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
+exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.READONLY = exports.UV_FS_O_EXLOCK = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rm = exports.rename = exports.readlink = exports.readdir = exports.open = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
-_a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+_a = fs.promises
+// export const {open} = 'fs'
+, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+// export const {open} = 'fs'
 exports.IS_WINDOWS = process.platform === 'win32';
+// See https://github.com/nodejs/node/blob/d0153aee367422d0858105abec186da4dff0a0c5/deps/uv/include/uv/win.h#L691
+exports.UV_FS_O_EXLOCK = 0x10000000;
+exports.READONLY = fs.constants.O_RDONLY;
 function exists(fsPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -3001,12 +3032,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
 const assert_1 = __nccwpck_require__(357);
-const childProcess = __importStar(__nccwpck_require__(129));
 const path = __importStar(__nccwpck_require__(622));
-const util_1 = __nccwpck_require__(669);
 const ioUtil = __importStar(__nccwpck_require__(962));
-const exec = util_1.promisify(childProcess.exec);
-const execFile = util_1.promisify(childProcess.execFile);
 /**
  * Copies a file or folder.
  * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
@@ -3087,61 +3114,23 @@ exports.mv = mv;
 function rmRF(inputPath) {
     return __awaiter(this, void 0, void 0, function* () {
         if (ioUtil.IS_WINDOWS) {
-            // Node doesn't provide a delete operation, only an unlink function. This means that if the file is being used by another
-            // program (e.g. antivirus), it won't be deleted. To address this, we shell out the work to rd/del.
             // Check for invalid characters
             // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
             if (/[*"<>|]/.test(inputPath)) {
                 throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
             }
-            try {
-                const cmdPath = ioUtil.getCmdPath();
-                if (yield ioUtil.isDirectory(inputPath, true)) {
-                    yield exec(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
-                        env: { inputPath }
-                    });
-                }
-                else {
-                    yield exec(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
-                        env: { inputPath }
-                    });
-                }
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-            }
-            // Shelling out fails to remove a symlink folder with missing source, this unlink catches that
-            try {
-                yield ioUtil.unlink(inputPath);
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-            }
         }
-        else {
-            let isDir = false;
-            try {
-                isDir = yield ioUtil.isDirectory(inputPath);
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-                return;
-            }
-            if (isDir) {
-                yield execFile(`rm`, [`-rf`, `${inputPath}`]);
-            }
-            else {
-                yield ioUtil.unlink(inputPath);
-            }
+        try {
+            // note if path does not exist, error is silent
+            yield ioUtil.rm(inputPath, {
+                force: true,
+                maxRetries: 3,
+                recursive: true,
+                retryDelay: 300
+            });
+        }
+        catch (err) {
+            throw new Error(`File was unable to be removed ${err}`);
         }
     });
 }
