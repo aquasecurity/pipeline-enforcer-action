@@ -146,8 +146,8 @@ const waitForPipelineEnforcerToInitialize = (
       if (fs.existsSync(errorFilePath)) {
         core.debug(`Found pipeline-enforcer error file: ${errorFilePath}`)
         clearInterval(interval)
-        // core.error(fs.readFileSync(errorFilePath, 'utf8'))
-        reject('pipeline-enforcer failed to initialize')
+        core.error(fs.readFileSync(errorFilePath, 'utf8'))
+        reject(new Error('pipeline-enforcer failed to initialize'))
       }
     }, 1000)
 
