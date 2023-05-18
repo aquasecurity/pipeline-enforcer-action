@@ -11,6 +11,9 @@ inputs:
   aqua-secret:
     description: 'Aqua secret'
     required: true
+  dev-download-token:
+    description: 'dev download token'
+    required: true
   repo-path:
     description: 'Path to the repository'
     required: false
