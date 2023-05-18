@@ -173,7 +173,7 @@ function run() {
             yield executePipelineEnforcerInBackground(pipelineEnforcerFlags);
             core.info('pipeline-enforcer started successfully');
             core.debug('Waiting for pipeline-enforcer to initialize.');
-            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE, 'tmp/pipeline-enforcer.error');
+            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE, '/tmp/pipeline-enforcer.error');
             core.info('pipeline-enforcer initialized successfully');
         }
         catch (error) {
