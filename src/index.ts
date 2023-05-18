@@ -57,15 +57,15 @@ const downloadPipelineEnforcerCommercial = async (
   // await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
   const {devDownloadToken} = pipelineEnforcerFlags
   await downloadToFile(INTEGRITY_CLI_DEV_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
-  const expectedChecksum = await getChecksum()
-  const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
-  core.debug(`Expected checksum: ${expectedChecksum}`)
-  core.debug(`Actual checksum: ${actualChecksum}`)
-  if (expectedChecksum !== actualChecksum) {
-    throw new Error(
-      `Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`
-    )
-  }
+  // const expectedChecksum = await getChecksum()
+  // const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
+  // core.debug(`Expected checksum: ${expectedChecksum}`)
+  // core.debug(`Actual checksum: ${actualChecksum}`)
+  // if (expectedChecksum !== actualChecksum) {
+  //   throw new Error(
+  //     `Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`
+  //   )
+  // }
 
   // await executeInstallationScript()
   await executeInstallationScript(devDownloadToken ? devDownloadToken : '')
