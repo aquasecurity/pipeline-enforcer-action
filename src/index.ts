@@ -174,7 +174,7 @@ async function run(): Promise<void> {
     await waitForPipelineEnforcerToInitialize(
       30000,
       PIPELINE_ENFORCER_INIT_FILE,
-      'tmp/pipeline-enforcer.errorr'
+      'tmp/pipeline-enforcer.error'
     )
     core.info('pipeline-enforcer initialized successfully')
   } catch (error) {
