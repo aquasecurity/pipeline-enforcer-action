@@ -179,7 +179,7 @@ function run() {
             core.debug('Waiting for pipeline-enforcer to initialize.');
             yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE);
             core.info('pipeline-enforcer initialized successfully');
-            yield checkPipelineEnforcerError(30000, "tmp/pipeline-enforcer.error");
+            yield checkPipelineEnforcerError(30000, 'tmp/pipeline-enforcer.error');
         }
         catch (error) {
             if (error instanceof Error) {
