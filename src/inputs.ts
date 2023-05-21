@@ -22,13 +22,13 @@ export const extractStartInputs = (): PipelineEnforcerStartFlags => {
 }
 
 export const validateInputs = (flags: PipelineEnforcerStartFlags) => {
-  // if (!flags.aquaKey) {
-  //   throw new Error('Required input aqua-key is empty')
-  // }
+  if (!flags.aquaKey) {
+    throw new Error('Required input aqua-key is empty')
+  }
 
-  // if (!flags.aquaSecret) {
-  //   throw new Error('Required input aqua-secret is empty')
-  // }
+  if (!flags.aquaSecret) {
+    throw new Error('Required input aqua-secret is empty')
+  }
 
   if (!flags.accessToken) {
     throw new Error('Required input access-token is empty')

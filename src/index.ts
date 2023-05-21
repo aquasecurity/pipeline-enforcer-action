@@ -11,8 +11,6 @@ const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start'
 const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh'
-const INTEGRITY_CLI_DEV_DOWNLOAD_URL =
-  'https://download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh'
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL =
   'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum'
 
@@ -40,35 +38,29 @@ const getFileSHA256 = (filePath: string) => {
   return hash
 }
 
-const executeInstallationScript = async (devDownloadToken: string) => {
+const executeInstallationScript = async () => {
   const command = `sh`
-  await exec(command, [INSTALLATION_SCRIPT_PATH, devDownloadToken], {
+  await exec(command, [INSTALLATION_SCRIPT_PATH], {
     env: {
       ...process.env,
-      BINDIR: '.',
-      DEBUG: 'true'
+      BINDIR: '.'
     }
   })
 }
 
-const downloadPipelineEnforcerCommercial = async (
-  pipelineEnforcerFlags: PipelineEnforcerStartFlags
-) => {
-  // await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
-  const {devDownloadToken} = pipelineEnforcerFlags
-  await downloadToFile(INTEGRITY_CLI_DEV_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
-  // const expectedChecksum = await getChecksum()
-  // const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
-  // core.debug(`Expected checksum: ${expectedChecksum}`)
-  // core.debug(`Actual checksum: ${actualChecksum}`)
-  // if (expectedChecksum !== actualChecksum) {
-  //   throw new Error(
-  //     `Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`
-  //   )
-  // }
+const downloadPipelineEnforcerCommercial = async () => {
+  await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
+  const expectedChecksum = await getChecksum()
+  const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
+  core.debug(`Expected checksum: ${expectedChecksum}`)
+  core.debug(`Actual checksum: ${actualChecksum}`)
+  if (expectedChecksum !== actualChecksum) {
+    throw new Error(
+      `Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`
+    )
+  }
 
-  // await executeInstallationScript()
-  await executeInstallationScript(devDownloadToken ? devDownloadToken : '')
+  await executeInstallationScript()
   try {
     fs.rmSync(INSTALLATION_SCRIPT_PATH)
   } catch (error) {
@@ -171,7 +163,7 @@ async function run(): Promise<void> {
     validateInputs(pipelineEnforcerFlags)
     core.debug('inputs validated successfully')
     core.debug('Downloading pipeline-enforcer binary')
-    await downloadPipelineEnforcerCommercial(pipelineEnforcerFlags)
+    await downloadPipelineEnforcerCommercial()
     core.info('pipeline-enforcer binary downloaded successfully')
     core.debug('Starting pipeline-enforcer in the background')
     await executePipelineEnforcerInBackground(pipelineEnforcerFlags)
