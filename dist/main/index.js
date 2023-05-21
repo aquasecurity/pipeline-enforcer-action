@@ -148,6 +148,21 @@ const waitForPipelineEnforcerToInitialize = (timeout, initFilePath) => {
         }, timeout);
     });
 };
+const checkPipelineEnforcerError = (timeout, errorFilePath) => {
+    return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+            if (fs.existsSync(errorFilePath)) {
+                core.debug(`Found pipeline-enforcer error file: ${errorFilePath}`);
+                clearInterval(interval);
+                reject(new Error('pipeline enforce error'));
+            }
+        }, 1000);
+        setTimeout(() => {
+            clearInterval(interval);
+            resolve();
+        }, timeout);
+    });
+};
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -164,6 +179,7 @@ function run() {
             core.debug('Waiting for pipeline-enforcer to initialize.');
             yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE);
             core.info('pipeline-enforcer initialized successfully');
+            yield checkPipelineEnforcerError(30000, "tmp/pipeline-enforcer.error");
         }
         catch (error) {
             if (error instanceof Error) {
