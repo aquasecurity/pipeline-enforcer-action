@@ -49,9 +49,9 @@ const http = __importStar(__nccwpck_require__(255));
 const fs = __importStar(__nccwpck_require__(747));
 const inputs_1 = __nccwpck_require__(180);
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start';
+const PIPELINE_ENFORCER_ERROR_FILE = '/tmp/pipeline-enforcer.error';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh';
-const INTEGRITY_CLI_DEV_DOWNLOAD_URL = 'https://download.dev-aqua.codesec.aquasec.com/pipeline-enforcer/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
 const httpClient = new http.HttpClient('pipeline-enforcer-action');
 const downloadToFile = (url, filePath) => __awaiter(void 0, void 0, void 0, function* () {
@@ -71,27 +71,22 @@ const getFileSHA256 = (filePath) => {
     const hash = crypto_1.default.createHash('sha256').update(data).digest('hex');
     return hash;
 };
-const executeInstallationScript = (devDownloadToken) => __awaiter(void 0, void 0, void 0, function* () {
+const executeInstallationScript = () => __awaiter(void 0, void 0, void 0, function* () {
     const command = `sh`;
-    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH, devDownloadToken], {
-        env: Object.assign(Object.assign({}, process.env), { BINDIR: '.', DEBUG: 'true' })
+    yield (0, exec_1.exec)(command, [INSTALLATION_SCRIPT_PATH], {
+        env: Object.assign(Object.assign({}, process.env), { BINDIR: '.' })
     });
 });
-const downloadPipelineEnforcerCommercial = (pipelineEnforcerFlags) => __awaiter(void 0, void 0, void 0, function* () {
-    // await downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH)
-    const { devDownloadToken } = pipelineEnforcerFlags;
-    yield downloadToFile(INTEGRITY_CLI_DEV_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
-    // const expectedChecksum = await getChecksum()
-    // const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH)
-    // core.debug(`Expected checksum: ${expectedChecksum}`)
-    // core.debug(`Actual checksum: ${actualChecksum}`)
-    // if (expectedChecksum !== actualChecksum) {
-    //   throw new Error(
-    //     `Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`
-    //   )
-    // }
-    // await executeInstallationScript()
-    yield executeInstallationScript(devDownloadToken ? devDownloadToken : '');
+const downloadPipelineEnforcerCommercial = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield downloadToFile(INTEGRITY_CLI_DOWNLOAD_URL, INSTALLATION_SCRIPT_PATH);
+    const expectedChecksum = yield getChecksum();
+    const actualChecksum = getFileSHA256(INSTALLATION_SCRIPT_PATH);
+    core.debug(`Expected checksum: ${expectedChecksum}`);
+    core.debug(`Actual checksum: ${actualChecksum}`);
+    if (expectedChecksum !== actualChecksum) {
+        throw new Error(`Checksum mismatch. Expected ${expectedChecksum} but got ${actualChecksum}`);
+    }
+    yield executeInstallationScript();
     try {
         fs.rmSync(INSTALLATION_SCRIPT_PATH);
     }
@@ -167,13 +162,13 @@ function run() {
             (0, inputs_1.validateInputs)(pipelineEnforcerFlags);
             core.debug('inputs validated successfully');
             core.debug('Downloading pipeline-enforcer binary');
-            yield downloadPipelineEnforcerCommercial(pipelineEnforcerFlags);
+            yield downloadPipelineEnforcerCommercial();
             core.info('pipeline-enforcer binary downloaded successfully');
             core.debug('Starting pipeline-enforcer in the background');
             yield executePipelineEnforcerInBackground(pipelineEnforcerFlags);
             core.info('pipeline-enforcer started successfully');
             core.debug('Waiting for pipeline-enforcer to initialize.');
-            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE, '/tmp/pipeline-enforcer.error');
+            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE, PIPELINE_ENFORCER_ERROR_FILE);
             core.info('pipeline-enforcer initialized successfully');
         }
         catch (error) {
@@ -232,18 +227,17 @@ const extractStartInputs = () => {
         accessToken: core.getInput('access-token'),
         aquaKey: core.getInput('aqua-key'),
         aquaSecret: core.getInput('aqua-secret'),
-        devDownloadToken: core.getInput('dev-download-token'),
         matrix: matrix == 'null' ? '' : matrix
     };
 };
 exports.extractStartInputs = extractStartInputs;
 const validateInputs = (flags) => {
-    // if (!flags.aquaKey) {
-    //   throw new Error('Required input aqua-key is empty')
-    // }
-    // if (!flags.aquaSecret) {
-    //   throw new Error('Required input aqua-secret is empty')
-    // }
+    if (!flags.aquaKey) {
+        throw new Error('Required input aqua-key is empty');
+    }
+    if (!flags.aquaSecret) {
+        throw new Error('Required input aqua-secret is empty');
+    }
     if (!flags.accessToken) {
         throw new Error('Required input access-token is empty');
     }

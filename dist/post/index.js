@@ -45,18 +45,17 @@ const extractStartInputs = () => {
         accessToken: core.getInput('access-token'),
         aquaKey: core.getInput('aqua-key'),
         aquaSecret: core.getInput('aqua-secret'),
-        devDownloadToken: core.getInput('dev-download-token'),
         matrix: matrix == 'null' ? '' : matrix
     };
 };
 exports.extractStartInputs = extractStartInputs;
 const validateInputs = (flags) => {
-    // if (!flags.aquaKey) {
-    //   throw new Error('Required input aqua-key is empty')
-    // }
-    // if (!flags.aquaSecret) {
-    //   throw new Error('Required input aqua-secret is empty')
-    // }
+    if (!flags.aquaKey) {
+        throw new Error('Required input aqua-key is empty');
+    }
+    if (!flags.aquaSecret) {
+        throw new Error('Required input aqua-secret is empty');
+    }
     if (!flags.accessToken) {
         throw new Error('Required input access-token is empty');
     }
