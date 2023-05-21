@@ -8,6 +8,7 @@ import {extractStartInputs, isLogFilePathValid, validateInputs} from './inputs'
 import {PipelineEnforcerStartFlags} from './types'
 
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start'
+const PIPELINE_ENFORCER_ERROR_FILE = '/tmp/pipeline-enforcer.error'
 const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh'
@@ -125,7 +126,8 @@ const executePipelineEnforcerInBackground = async (
 
 const waitForPipelineEnforcerToInitialize = (
   timeout: number,
-  initFilePath: string
+  initFilePath: string,
+  errorFilePath: string
 ) => {
   return new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
@@ -133,6 +135,18 @@ const waitForPipelineEnforcerToInitialize = (
         core.debug(`Found pipeline-enforcer init file: ${initFilePath}`)
         clearInterval(interval)
         resolve()
+      }
+      if (fs.existsSync(errorFilePath)) {
+        core.debug(`Found pipeline-enforcer error file: ${errorFilePath}`)
+        clearInterval(interval)
+        reject(
+          new Error(
+            `pipeline-enforcer failed to initialize: ${fs.readFileSync(
+              errorFilePath,
+              'utf8'
+            )}`
+          )
+        )
       }
     }, 1000)
 
@@ -159,7 +173,8 @@ async function run(): Promise<void> {
     core.debug('Waiting for pipeline-enforcer to initialize.')
     await waitForPipelineEnforcerToInitialize(
       30000,
-      PIPELINE_ENFORCER_INIT_FILE
+      PIPELINE_ENFORCER_INIT_FILE,
+      PIPELINE_ENFORCER_ERROR_FILE
     )
     core.info('pipeline-enforcer initialized successfully')
   } catch (error) {
