@@ -8,6 +8,7 @@ import {extractStartInputs, isLogFilePathValid, validateInputs} from './inputs'
 import {PipelineEnforcerStartFlags} from './types'
 
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start'
+const PIPELINE_ENFORCER_ERROR_FILE = '/tmp/pipeline-enforcer.error'
 const INSTALLATION_SCRIPT_PATH = 'install.sh'
 const INTEGRITY_CLI_DOWNLOAD_URL =
   'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh'
@@ -173,7 +174,7 @@ async function run(): Promise<void> {
     await waitForPipelineEnforcerToInitialize(
       30000,
       PIPELINE_ENFORCER_INIT_FILE,
-      '/tmp/pipeline-enforcer.error'
+      PIPELINE_ENFORCER_ERROR_FILE
     )
     core.info('pipeline-enforcer initialized successfully')
   } catch (error) {
