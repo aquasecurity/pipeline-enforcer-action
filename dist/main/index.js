@@ -49,6 +49,7 @@ const http = __importStar(__nccwpck_require__(255));
 const fs = __importStar(__nccwpck_require__(747));
 const inputs_1 = __nccwpck_require__(180);
 const PIPELINE_ENFORCER_INIT_FILE = '/tmp/pipeline-enforcer.start';
+const PIPELINE_ENFORCER_ERROR_FILE = '/tmp/pipeline-enforcer.error';
 const INSTALLATION_SCRIPT_PATH = 'install.sh';
 const INTEGRITY_CLI_DOWNLOAD_URL = 'https://download.codesec.aquasec.com/pipeline-enforcer/install.sh';
 const INTEGRITY_INSTALLATION_SCRIPT_CHECKSUM_URL = 'https://github.com/argonsecurity/integrity-releases/releases/latest/download/install.sh.checksum';
@@ -133,13 +134,18 @@ const executePipelineEnforcerInBackground = (pipelineEnforcerFlags) => __awaiter
         detached: true
     });
 });
-const waitForPipelineEnforcerToInitialize = (timeout, initFilePath) => {
+const waitForPipelineEnforcerToInitialize = (timeout, initFilePath, errorFilePath) => {
     return new Promise((resolve, reject) => {
         const interval = setInterval(() => {
             if (fs.existsSync(initFilePath)) {
                 core.debug(`Found pipeline-enforcer init file: ${initFilePath}`);
                 clearInterval(interval);
                 resolve();
+            }
+            if (fs.existsSync(errorFilePath)) {
+                core.debug(`Found pipeline-enforcer error file: ${errorFilePath}`);
+                clearInterval(interval);
+                reject(new Error(`pipeline-enforcer failed to initialize: ${fs.readFileSync(errorFilePath, 'utf8')}`));
             }
         }, 1000);
         setTimeout(() => {
@@ -162,7 +168,7 @@ function run() {
             yield executePipelineEnforcerInBackground(pipelineEnforcerFlags);
             core.info('pipeline-enforcer started successfully');
             core.debug('Waiting for pipeline-enforcer to initialize.');
-            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE);
+            yield waitForPipelineEnforcerToInitialize(30000, PIPELINE_ENFORCER_INIT_FILE, PIPELINE_ENFORCER_ERROR_FILE);
             core.info('pipeline-enforcer initialized successfully');
         }
         catch (error) {
