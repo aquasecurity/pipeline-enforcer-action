@@ -29,7 +29,7 @@
     "@typescript-eslint/parser": "^5.52.0",
     "@vercel/ncc": "^0.31.1",
     "concurrently": "^4.1.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.0.0",
     "eslint-plugin-github": "^4.3.2",
     "eslint-plugin-jest": "^25.3.2",
     "jest": "^27.2.5",
