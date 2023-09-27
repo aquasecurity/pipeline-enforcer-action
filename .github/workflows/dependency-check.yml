@@ -1,14 +1,16 @@
-name: 'Dependency Review'
-on: [pull_request]
-
-permissions:
-  contents: read
-
+name: Trivy Action
+on:
+  pull_request:
 jobs:
-  dependency-review:
-    runs-on: ubuntu-latest
+  trivy-scan:
+    name: Build
+    runs-on: ubuntu-20.04
     steps:
-      - name: 'Checkout Repository'
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v3
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
