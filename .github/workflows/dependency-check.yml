@@ -5,16 +5,8 @@ permissions:
   contents: read
 
 jobs:
-  dependency-review:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v3
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v3
-
   trivy-scan:
-    name: Build
+    name: Trivy Scan
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
